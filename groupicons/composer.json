@@ -5,7 +5,7 @@
 	"homepage": "http://vinabb.vn/",
 	"version": "0.1.0",
 	"time": "2016-09-15",
-	"license": "MIT",
+	"license": "GPL-2.0",
 	"authors": [{
 		"name": "Khoa Nguyen",
 		"email": "nedka@vinabb.vn",
@@ -26,7 +26,7 @@
 		},
 		"version-check": {
 			"host": "raw.githubusercontent.com",
-			"directory": "/VinaBB/phpBB.Extensions/master/_update",
+			"directory": "/VinaBB/phpBB.Extensions/master/update",
 			"filename": "groupicons.json",
 			"ssl": true
 		}
