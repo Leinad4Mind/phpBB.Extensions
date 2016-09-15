@@ -15,6 +15,9 @@ class listener implements EventSubscriberInterface
 	/** @var \phpbb\cache\service */
 	protected $cache;
 
+	/** @var \phpbb\language\language */
+	protected $language;
+
 	/** @var \phpbb\template\template */
 	protected $template;
 
@@ -27,37 +30,41 @@ class listener implements EventSubscriberInterface
 	/** @var \phpbb\path_helper */
 	protected $path_helper;
 
-	/** @var string */
-	protected $root_path;
+	/** @var \phpbb\group\helper */
+	protected $group_helper;
 
 	/**
 	* Constructor
 	*
 	* @param \phpbb\cache\service $cache
+	* @param \phpbb\language\language $language
 	* @param \phpbb\template\template $template
 	* @param \phpbb\request\request $request
 	* @param \phpbb\extension\manager $ext_manager
 	* @param \phpbb\path_helper $path_helper
-	* @param string $root_path
+	* @param \phpbb\group\helper $group_helper
 	*/
 	public function __construct(
-		\vinabb\groupicons\decorated\cache\service $cache,
+		\phpbb\cache\service $cache,
+		\phpbb\language\language $language,
 		\phpbb\template\template $template,
 		\phpbb\request\request $request,
 		\phpbb\extension\manager $ext_manager,
 		\phpbb\path_helper $path_helper,
-		$root_path
+		\phpbb\group\helper $group_helper
 	)
 	{
 		$this->cache = $cache;
+		$this->language = $language;
 		$this->template = $template;
 		$this->request = $request;
 		$this->ext_manager = $ext_manager;
 		$this->path_helper = $path_helper;
-		$this->root_path = $root_path;
+		$this->group_helper = $group_helper;
 
 		$this->ext_root_path = $this->ext_manager->get_extension_path('vinabb/groupicons', true);
 		$this->ext_web_path = $this->path_helper->update_web_root_path($this->ext_root_path);
+		$this->group_data_by_color = array();
 	}
 
 	/**
@@ -100,9 +107,19 @@ class listener implements EventSubscriberInterface
 	*/
 	public function modify_username_string($event)
 	{
-		$group_data = $this->cache->get_group_data_by_color();
-		$group_icon = !empty($group_data[$event['username_colour']]['icon']) ? 'img src="' . $group_data[$event['username_colour']]['icon'] . '">' : '';
-		$event['username_string'] = $group_icon . $event['username_string'];
+		// profile|username|colour|full|no_profile
+		if ($event['mode'] == 'full')
+		{
+			if (!sizeof($this->group_data_by_color))
+			{
+				$this->group_data_by_color = $this->cache->get_group_data_by_color();
+			}
+
+			$key = str_replace('#', '', $event['username_colour']);
+			$group_name = $this->group_helper->get_name($this->group_data_by_color[$key]['name'], true);
+			$group_icon = !empty($this->group_data_by_color[$key]['icon']) ? '<img src="' . $this->ext_web_path . 'images/' . $this->group_data_by_color[$key]['icon'] . '" alt="' . $group_name . '" title="' . $group_name . '">' : '';
+			$event['username_string'] = ($this->language->lang('DIRECTION') == 'ltr') ? $group_icon . $event['username_string'] : $event['username_string'] . $group_icon;
+		}
 	}
 
 	/**
@@ -117,7 +134,7 @@ class listener implements EventSubscriberInterface
 		$event['submit_ary'] = $submit_ary;
 
 		$validation_checks = $event['validation_checks'];
-		$validation_checks['icon'] = array('match', false, '#(\.gif|\.png|\.jpg|\.jpeg)$#i');
+		$validation_checks['icon'] = array('match', true, '#(\.gif|\.png|\.jpg|\.jpeg)$#i');
 		$event['validation_checks'] = $validation_checks;
 	}
 
@@ -140,46 +157,32 @@ class listener implements EventSubscriberInterface
 	*/
 	public function acp_manage_group_display_form($event)
 	{
-		// Current
+		// Get from cache
 		$group_data = $this->cache->get_group_data();
-		$group_icon = $group_data[$event['group_id']]['icon'];
 
-		//
-		$img_list = filelist($this->ext_root_path . 'assets/images/group_icons', '', 'gif|png|jpg|jpeg');
-		$edit_img = $filename_list = '';
+		// Current group icon
+		$current_icon = $group_data[$event['group_id']]['icon'];
 
-		foreach ($img_list as $path => $img_ary)
+		// Group icon list
+		$icon_list = filelist($this->ext_root_path . 'images/', '', 'gif|png|jpg|jpeg');
+		$icon_options = '<option value=""' . (($current_icon == '') ? ' selected="selected"' : '') . '>' . $this->language->lang('SELECT_GROUP_ICON') . '</option>';
+
+		foreach ($icon_list as $path => $icon_ary)
 		{
-			sort($img_ary);
+			sort($icon_ary);
 
-			foreach ($img_ary as $img)
+			foreach ($icon_ary as $icon)
 			{
-				$img = $path . $img;
-
-				if ($img == $group_icon)
-				{
-					$selected = ' selected="selected"';
-					$edit_img = $img;
-				}
-				else
-				{
-					$selected = '';
-				}
-
-				if (strlen($img) > 255)
-				{
-					continue;
-				}
-
-				$filename_list .= '<option value="' . $img . '"' . $selected . '>' . $img . '</option>';
+				$icon = $path . $icon;
+				$selected = ($icon == $current_icon) ? ' selected="selected"' : '';
+				$icon_options .= '<option value="' . $icon . '"' . $selected . '>' . $icon . '</option>';
 			}
 		}
-
-		$filename_list = '<option value=""' . (($edit_img == '') ? ' selected="selected"' : '') . '>----------</option>' . $filename_list;
-
+		
 		$this->template->assign_vars(array(
-			'ICONS_PATH'	=> $this->ext_web_path . 'assets/images/group_icons/',
-			'ICON_OPTIONS'	=> $filename_list
+			'CURRENT_ICON_SRC'	=> !empty($current_icon) ? $this->ext_web_path . 'images/' . $current_icon : './images/spacer.gif',
+			'ICONS_PATH'		=> $this->ext_web_path . 'images/',
+			'ICON_OPTIONS'		=> $icon_options
 		));
 	}
 

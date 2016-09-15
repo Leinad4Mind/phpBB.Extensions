@@ -12,16 +12,21 @@ services:
         class: vinabb\groupicons\decorated\group\helper
         decorates: group_helper
         arguments:
-             - '@vinabb.groupicons.decorated.cache.service'
-             - '@language'
+            - '@cache'
+            - '@user'
+            - '@language'
+            - '@ext.manager'
+            - '@path_helper'
+            - '%core.php_ext%'
     vinabb.groupicons.listener:
         class: vinabb\groupicons\event\listener
         arguments:
-            - '@vinabb.groupicons.decorated.cache.service'
+            - '@cache'
+            - '@language'
             - '@template'
             - '@request'
             - '@ext.manager'
             - '@path_helper'
-            - '%core.root_path%'
+            - '@group_helper'
         tags:
             - { name: event.listener }

@@ -34,6 +34,8 @@ class service extends \phpbb\cache\service
 
 			$this->driver->put('_vinabb_groupicons_group_data', $group_data);
 		}
+
+		return $group_data;
 	}
 
 	/**
@@ -60,6 +62,8 @@ class service extends \phpbb\cache\service
 
 			$this->driver->put('_vinabb_groupicons_group_data_by_name', $group_data);
 		}
+
+		return $group_data;
 	}
 
 	/**
@@ -86,6 +90,8 @@ class service extends \phpbb\cache\service
 
 			$this->driver->put('_vinabb_groupicons_group_data_by_color', $group_data);
 		}
+
+		return $group_data;
 	}
 
 	/**

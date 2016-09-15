@@ -25,5 +25,6 @@ if (empty($lang) || !is_array($lang))
 * and the files must not contain a BOM.
 */
 $lang = array_merge($lang, array(
-	'GROUP_ICON'	=> 'Group icon',
+	'GROUP_ICON'		=> 'Group icon',
+	'SELECT_GROUP_ICON'	=> 'Select a group icon…',
 ));
