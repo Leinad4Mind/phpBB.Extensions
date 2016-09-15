@@ -1,0 +1,27 @@
+services:
+    vinabb.groupicons.decorated.cache.service:
+        class: vinabb\groupicons\decorated\cache\service
+        decorates: cache
+        arguments:
+             - '@cache.driver'
+             - '@config'
+             - '@dbal.conn'
+             - '%core.root_path%'
+             - '%core.php_ext%'
+    vinabb.groupicons.decorated.group.helper:
+        class: vinabb\groupicons\decorated\group\helper
+        decorates: group_helper
+        arguments:
+             - '@vinabb.groupicons.decorated.cache.service'
+             - '@language'
+    vinabb.groupicons.listener:
+        class: vinabb\groupicons\event\listener
+        arguments:
+            - '@vinabb.groupicons.decorated.cache.service'
+            - '@template'
+            - '@request'
+            - '@ext.manager'
+            - '@path_helper'
+            - '%core.root_path%'
+        tags:
+            - { name: event.listener }
