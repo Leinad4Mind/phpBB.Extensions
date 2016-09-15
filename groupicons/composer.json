@@ -3,8 +3,8 @@
 	"type": "phpbb-extension",
 	"description": "Display the group icon in front of usernames based on their promary group.",
 	"homepage": "http://vinabb.vn/",
-	"version": "0.1.0",
-	"time": "2016-09-15",
+	"version": "0.2.0",
+	"time": "2016-09-16",
 	"license": "GPL-2.0",
 	"authors": [{
 		"name": "Khoa Nguyen",
