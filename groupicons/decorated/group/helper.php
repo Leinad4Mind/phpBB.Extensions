@@ -53,6 +53,7 @@ class helper extends \phpbb\group\helper
 
 		$this->ext_root_path = $this->ext_manager->get_extension_path('vinabb/groupicons', true);
 		$this->ext_web_path = $this->path_helper->update_web_root_path($this->ext_root_path);
+		$this->group_data_by_name = array();
 	}
 
 	/**
@@ -68,8 +69,12 @@ class helper extends \phpbb\group\helper
 		// Only display in group legend on the index page :p
 		if (!defined('IN_ADMIN') && $this->user->page['page_name'] == "index.{$this->php_ext}")
 		{
-			$group_data = $this->cache->get_group_data_by_name();
-			$group_icon = (isset($group_data[$group_name]['icon']) && !empty($group_data[$group_name]['icon'])) ? '<img src="' . $this->ext_web_path . 'images/' . $group_data[$group_name]['icon'] . '" alt="' . $group_name_display . '" title="' . $group_name_display . '">' : '';
+			if (!sizeof($this->group_data_by_name))
+			{
+				$this->group_data_by_name = $this->cache->get_group_data_by_name();
+			}
+
+			$group_icon = (isset($this->group_data_by_name[$group_name]['icon']) && !empty($this->group_data_by_name[$group_name]['icon'])) ? '<img src="' . $this->ext_web_path . 'images/' . $this->group_data_by_name[$group_name]['icon'] . '" alt="' . $group_name_display . '" title="' . $group_name_display . '">' : '';
 
 			return ($only_name) ? $group_name_display : (($this->language->lang('DIRECTION') == 'ltr') ? $group_icon . $group_name_display : $group_name_display . $group_icon);
 		}
