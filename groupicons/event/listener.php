@@ -116,7 +116,7 @@ class listener implements EventSubscriberInterface
 			}
 
 			$key = str_replace('#', '', $event['username_colour']);
-			$group_name = isset($this->user->lang[$this->group_data_by_color[$key]['name']]) ? $this->user->lang($this->group_data_by_color[$key]['name']) : $this->group_data_by_color[$key]['name'];
+			$group_name = isset($this->user->lang['G_' . utf8_strtoupper($this->group_data_by_color[$key]['name'])]) ? $this->user->lang('G_' . utf8_strtoupper($this->group_data_by_color[$key]['name'])) : $this->group_data_by_color[$key]['name'];
 			$group_icon = !empty($this->group_data_by_color[$key]['icon']) ? '<img src="' . $this->ext_web_path . 'images/' . $this->group_data_by_color[$key]['icon'] . '" alt="' . $group_name . '" title="' . $group_name . '">' : '';
 			$event['username_string'] = ($this->user->lang('DIRECTION') == 'ltr') ? $group_icon . $event['username_string'] : $event['username_string'] . $group_icon;
 		}
