@@ -3,7 +3,7 @@
 	"type": "phpbb-extension",
 	"description": "Display the group icon in front of usernames based on their promary group.",
 	"homepage": "http://vinabb.vn/",
-	"version": "0.2.0",
+	"version": "0.1.0",
 	"time": "2016-09-16",
 	"license": "GPL-2.0",
 	"authors": [{
@@ -22,11 +22,11 @@
 	"extra": {
 		"display-name": "Group Icons",
 		"soft-require": {
-			"phpbb/phpbb": ">=3.2.0-RC1,<3.3.0@dev"
+			"phpbb/phpbb": ">=3.1.0,<3.3.0@dev"
 		},
 		"version-check": {
 			"host": "raw.githubusercontent.com",
-			"directory": "/VinaBB/phpBB.Extensions/master/update",
+			"directory": "/VinaBB/phpBB.Extensions/3.1.x/update",
 			"filename": "groupicons.json",
 			"ssl": true
 		}

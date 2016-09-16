@@ -12,11 +12,14 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class listener implements EventSubscriberInterface
 {
-	/** @var \phpbb\cache\service */
+	/** @var \phpbb\db\driver\driver_interface */
+	protected $db;
+
+	/** @var \phpbb\cache\driver\driver_interface */
 	protected $cache;
 
-	/** @var \phpbb\language\language */
-	protected $language;
+	/** @var \phpbb\user */
+	protected $user;
 
 	/** @var \phpbb\template\template */
 	protected $template;
@@ -30,37 +33,34 @@ class listener implements EventSubscriberInterface
 	/** @var \phpbb\path_helper */
 	protected $path_helper;
 
-	/** @var \phpbb\group\helper */
-	protected $group_helper;
-
 	/**
 	* Constructor
 	*
-	* @param \phpbb\cache\service $cache
-	* @param \phpbb\language\language $language
+	* @param \phpbb\db\driver\driver_interface $db
+	* @param \phpbb\cache\driver\driver_interface $cache
+	* @param \phpbb\user $user
 	* @param \phpbb\template\template $template
 	* @param \phpbb\request\request $request
 	* @param \phpbb\extension\manager $ext_manager
 	* @param \phpbb\path_helper $path_helper
-	* @param \phpbb\group\helper $group_helper
 	*/
 	public function __construct(
-		\phpbb\cache\service $cache,
-		\phpbb\language\language $language,
+		\phpbb\db\driver\driver_interface $db,
+		\phpbb\cache\driver\driver_interface $cache,
+		\phpbb\user $user,
 		\phpbb\template\template $template,
 		\phpbb\request\request $request,
 		\phpbb\extension\manager $ext_manager,
-		\phpbb\path_helper $path_helper,
-		\phpbb\group\helper $group_helper
+		\phpbb\path_helper $path_helper
 	)
 	{
+		$this->db = $db;
 		$this->cache = $cache;
-		$this->language = $language;
+		$this->user = $user;
 		$this->template = $template;
 		$this->request = $request;
 		$this->ext_manager = $ext_manager;
 		$this->path_helper = $path_helper;
-		$this->group_helper = $group_helper;
 
 		$this->ext_root_path = $this->ext_manager->get_extension_path('vinabb/groupicons', true);
 		$this->ext_web_path = $this->path_helper->update_web_root_path($this->ext_root_path);
@@ -112,13 +112,13 @@ class listener implements EventSubscriberInterface
 		{
 			if (!sizeof($this->group_data_by_color))
 			{
-				$this->group_data_by_color = $this->cache->get_group_data_by_color();
+				$this->group_data_by_color = $this->get_group_data_by_color();
 			}
 
 			$key = str_replace('#', '', $event['username_colour']);
-			$group_name = $this->group_helper->get_name($this->group_data_by_color[$key]['name'], true);
+			$group_name = isset($this->user->lang[$this->group_data_by_color[$key]['name']]) ? $this->user->lang($this->group_data_by_color[$key]['name']) : $this->group_data_by_color[$key]['name'];
 			$group_icon = !empty($this->group_data_by_color[$key]['icon']) ? '<img src="' . $this->ext_web_path . 'images/' . $this->group_data_by_color[$key]['icon'] . '" alt="' . $group_name . '" title="' . $group_name . '">' : '';
-			$event['username_string'] = ($this->language->lang('DIRECTION') == 'ltr') ? $group_icon . $event['username_string'] : $event['username_string'] . $group_icon;
+			$event['username_string'] = ($this->user->lang('DIRECTION') == 'ltr') ? $group_icon . $event['username_string'] : $event['username_string'] . $group_icon;
 		}
 	}
 
@@ -158,14 +158,14 @@ class listener implements EventSubscriberInterface
 	public function acp_manage_group_display_form($event)
 	{
 		// Get from cache
-		$group_data = $this->cache->get_group_data();
+		$group_data = $this->get_group_data();
 
 		// Current group icon
 		$current_icon = $group_data[$event['group_id']]['icon'];
 
 		// Group icon list
 		$icon_list = filelist($this->ext_root_path . 'images/', '', 'gif|png|jpg|jpeg');
-		$icon_options = '<option value=""' . (($current_icon == '') ? ' selected="selected"' : '') . '>' . $this->language->lang('SELECT_GROUP_ICON') . '</option>';
+		$icon_options = '<option value=""' . (($current_icon == '') ? ' selected="selected"' : '') . '>' . $this->user->lang('SELECT_GROUP_ICON') . '</option>';
 
 		foreach ($icon_list as $path => $icon_ary)
 		{
@@ -195,7 +195,73 @@ class listener implements EventSubscriberInterface
 	{
 		if ($event['log_operation'] == 'LOG_GROUP_CREATED' || $event['log_operation'] == 'LOG_GROUP_DELETE' || $event['log_operation'] == 'LOG_GROUP_UPDATED')
 		{
-			$this->cache->clear_group_data();
+			$this->clear_group_data();
 		}
+	}
+
+	/**
+	* Create cache: phpbb_groups
+	*/
+	protected function get_group_data()
+	{
+		if (($group_data = $this->cache->get('_vinabb_groupicons_group_data')) === false)
+		{
+			$sql = 'SELECT *
+				FROM ' . GROUPS_TABLE;
+			$result = $this->db->sql_query($sql);
+
+			$group_data = array();
+			while ($row = $this->db->sql_fetchrow($result))
+			{
+				$group_data[$row['group_id']] = array(
+					'name'		=> $row['group_name'],
+					'colour'	=> $row['group_colour'],
+					'icon'		=> $row['group_icon'],
+				);
+			}
+			$this->db->sql_freeresult($result);
+
+			$this->cache->put('_vinabb_groupicons_group_data', $group_data);
+		}
+
+		return $group_data;
+	}
+
+	/**
+	* Create cache: phpbb_groups
+	*/
+	protected function get_group_data_by_color()
+	{
+		if (($group_data = $this->cache->get('_vinabb_groupicons_group_data_by_color')) === false)
+		{
+			$sql = 'SELECT *
+				FROM ' . GROUPS_TABLE;
+			$result = $this->db->sql_query($sql);
+
+			$group_data = array();
+			while ($row = $this->db->sql_fetchrow($result))
+			{
+				$group_data[$row['group_colour']] = array(
+					'id'	=> $row['group_id'],
+					'name'	=> $row['group_name'],
+					'icon'	=> $row['group_icon'],
+				);
+			}
+			$this->db->sql_freeresult($result);
+
+			$this->cache->put('_vinabb_groupicons_group_data_by_color', $group_data);
+		}
+
+		return $group_data;
+	}
+
+	/**
+	* Clear cache: phpbb_groups
+	*/
+	protected function clear_group_data()
+	{
+		$this->cache->destroy('_vinabb_groupicons_group_data');
+		$this->cache->destroy('_vinabb_groupicons_group_data_by_name');
+		$this->cache->destroy('_vinabb_groupicons_group_data_by_color');
 	}
 }
