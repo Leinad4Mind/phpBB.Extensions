@@ -6,13 +6,6 @@
 			"announcement": "http://vinabb.vn/viewtopic.php?f=7&t=18",
 			"eol": null,
 			"security": false
-		},
-		"0.2": {
-			"current": "0.2.0",
-			"download": "https://github.com/VinaBB/phpBB.Extensions/releases/download/release-groupicons-0.2.0/Group.Icons.0.2.0.zip",
-			"announcement": "http://vinabb.vn/viewtopic.php?f=7&t=18",
-			"eol": null,
-			"security": false
 		}
 	},
 	"unstable": {
