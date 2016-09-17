@@ -105,8 +105,6 @@ class listener implements EventSubscriberInterface
 
 		if ($anniversary_data === false || $time > $expired_time)
 		{
-			$now = phpbb_gmgetdate($time);
-
 			// Get the begin year
 			$sql = 'SELECT MIN(user_regdate) as min_user_regdate
 				FROM ' . USERS_TABLE;
@@ -119,6 +117,7 @@ class listener implements EventSubscriberInterface
 			$now_month = date('m', $time);
 			$now_day = date('d', $time);
 
+			// Does Time Machine already exist?
 			$sql_or = '';
 			if ($now_year > $min_year)
 			{
@@ -129,17 +128,17 @@ class listener implements EventSubscriberInterface
 					$sql_or .= (empty($sql_or) ? '' : ' OR ');
 					$sql_or .= '(u.user_regdate > ' . (strtotime("{$now_day}-{$now_month}-{$i} 00:00:00") - 1) . ' AND u.user_regdate < ' . (strtotime("{$now_day}-{$now_month}-{$i} 23:59:59") + 1) . ')';
 				}
+
+				// Display anniversary of 29th february on 28th february in non-leap-years
+				if ($now_day == '28' && $now_day == '02' && !date('L', $time) && date('L', strtotime("01-01-{$i}")))
+				{
+					$sql_or .= (empty($sql_or) ? '' : ' OR ');
+					$sql_or .= '(u.user_regdate > ' . (strtotime("29-02-{$i} 00:00:00") - 1) . ' AND u.user_regdate < ' . (strtotime("29-02-{$i} 23:59:59") + 1) . ')';
+				}
 			}
 			$sql_and = empty($sql_or) ? '0' : "($sql_or)";
 
-			// Array ( [seconds] => 24 [minutes] => 3 [hours] => 4 [mday] => 17 [wday] => 6 [mon] => 9 [year] => 2016 [yday] => 260 [weekday] => Saturday [month] => September [0] => 1474077804 ) 1
-			// Display birthdays of 29th february on 28th february in non-leap-years
-			$leap_year_birthdays = '';
-			if ($now['mday'] == 29 && $now['mon'] == 2 && !$time->format('L'))
-			{
-				$leap_year_birthdays = " OR u.user_regdate LIKE '" . $this->db->sql_escape(sprintf('%2d-%2d-', 29, 2)) . "%'";
-			}
-
+			// Build the query
 			$sql_ary = array(
 				'SELECT' => 'u.user_id, u.username, u.user_colour, u.user_regdate',
 				'FROM' => array(
@@ -171,6 +170,7 @@ class listener implements EventSubscriberInterface
 					'years'			=> $years,
 				);
 
+				// Push a notification and/or send an email to the user
 				$this->notification->add_notifications('vinabb.happyanniversary.notification.type.happy_anniversary', array(
 					'user_id'	=> $row['user_id'],
 					'username'	=> $row['username'],
@@ -179,15 +179,18 @@ class listener implements EventSubscriberInterface
 			}
 			$this->db->sql_freeresult($result);
 
+			// THe next day, how many seconds left?
 			$this->cache->put('_vinabb_happyanniversary_data', $anniversary_data, $expired_time - $time);
 		}
 
+		// Get the list of anniversary users
 		$anniversary_users = '';
 		foreach ($anniversary_data as $anniversary_user)
 		{
 			$anniversary_users .= (empty($anniversary_users) ? '' : ', ') . get_username_string('full', $anniversary_user['user_id'], $anniversary_user['username'], $anniversary_user['user_colour']) . ' (' . $anniversary_user['years'] . ')';
 		}
 
+		// Output
 		$this->template->assign_vars(array(
 			'HAPPY_ANNIVERSARY_TEXT'	=> !empty($anniversary_users) ? $this->user->lang('HAPPY_ANNIVERSARY_TEXT', $anniversary_users) : '',
 		));
