@@ -1,0 +1,11 @@
+services:
+    vinabb.happyanniversary.listener:
+        class: vinabb\happyanniversary\event\listener
+        arguments:
+            - '@dbal.conn'
+            - '@cache.driver'
+            - '@config'
+            - '@template'
+            - '@user'
+        tags:
+            - { name: event.listener }
