@@ -21,11 +21,14 @@ class listener implements EventSubscriberInterface
 	/** @var \phpbb\config\config */
     protected $config;
 
-	/** @var \phpbb\template\template */
-    protected $template;
-
 	/** @var \phpbb\user */
     protected $user;
+
+	/** @var \phpbb\template\template */
+	protected $template;
+
+	/** @var \phpbb\notification\manager */
+	protected $notification;
 
 	/**
 	* Constructor
@@ -33,22 +36,25 @@ class listener implements EventSubscriberInterface
 	* @param \phpbb\db\driver\driver_interface $db
 	* @param \phpbb\cache\driver\driver_interface $cache
 	* @param \phpbb\config\config $config
-	* @param \phpbb\template\template $template
 	* @param \phpbb\user $user
+	* @param \phpbb\template\template $template
+	* @param \phpbb\notification\manager $notification
 	*/
 	public function __construct(
 		\phpbb\db\driver\driver_interface $db,
 		\phpbb\cache\driver\driver_interface $cache,
 		\phpbb\config\config $config,
+		\phpbb\user $user,
 		\phpbb\template\template $template,
-		\phpbb\user $user
+		\phpbb\notification\manager $notification
 	)
 	{
 		$this->db = $db;
 		$this->cache = $cache;
 		$this->config = $config;
-		$this->template = $template;
 		$this->user = $user;
+		$this->template = $template;
+		$this->notification = $notification;
 	}
 
 	/**
@@ -171,6 +177,11 @@ class listener implements EventSubscriberInterface
 		$anniversary_users = '';
 		foreach ($anniversary_data as $anniversary_user)
 		{
+			$this->notification->add_notifications('vinabb.happyanniversary.notification.type.happy_anniversary', array(
+				'user_id'	=> $anniversary_user['user_id'],
+				'years'		=> $anniversary_user['years'],
+			));
+
 			$anniversary_users .= (empty($anniversary_users) ? '' : ', ') . get_username_string('full', $anniversary_user['user_id'], $anniversary_user['username'], $anniversary_user['user_colour']) . ' (' . $anniversary_user['years'] . ')';
 		}
 

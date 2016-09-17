@@ -66,9 +66,9 @@ class happy_anniversary extends \phpbb\notification\type\base
 	* @param array $data The data for the updated rules
 	* @return int Id of the notification
 	*/
-	public static function get_item_id($data)
+	public static function get_item_id($user)
 	{
-		return $data['notification_id'];
+		return (int) $user['user_id'];
 	}
 
 	/**
@@ -108,7 +108,9 @@ class happy_anniversary extends \phpbb\notification\type\base
 	}
 
 	/**
-	* {@inheritdoc}
+	* Get the HTML formatted title of this notification
+	*
+	* @return string
 	*/
 	public function get_title()
 	{
@@ -118,11 +120,13 @@ class happy_anniversary extends \phpbb\notification\type\base
 	}
 
 	/**
-	* {@inheritdoc}
+	* Get email template
+	*
+	* @return string|bool
 	*/
 	public function get_email_template()
 	{
-		return 'admin_activate';
+		return 'happy_anniversary';
 	}
 
 	/**
@@ -134,9 +138,9 @@ class happy_anniversary extends \phpbb\notification\type\base
 		$username = $this->user_loader->get_username($this->item_id, 'username');
 
 		return array(
-			'USERNAME'			=> htmlspecialchars_decode($username),
-			'U_USER_DETAILS'	=> "{$board_url}/memberlist.{$this->php_ext}?mode=viewprofile&u={$this->item_id}",
-			'U_ACTIVATE'		=> "{$board_url}/ucp.{$this->php_ext}?mode=activate&u={$this->item_id}&k={$this->get_data('user_actkey')}",
+			'USERNAME'	=> htmlspecialchars_decode($username),
+			'U_BOARD'	=> $board_url,
+			'YEARS'		=> $this->get_data('years'),
 		);
 	}
 
@@ -165,11 +169,11 @@ class happy_anniversary extends \phpbb\notification\type\base
 	*
 	* @return array Array of data ready to be inserted into the database
 	*/
-	public function create_insert_array($user, $pre_create_data)
+	public function create_insert_array($data, $pre_create_data)
 	{
-		$this->set_data('user_actkey', $user['user_actkey']);
-		$this->notification_time = $user['user_regdate'];
+		$this->set_data('years', $data['years']);
+		//$this->notification_time = $user['user_regdate'];
 
-		return parent::create_insert_array($user, $pre_create_data);
+		return parent::create_insert_array($data, $pre_create_data);
 	}
 }

@@ -5,12 +5,13 @@ services:
             - '@dbal.conn'
             - '@cache.driver'
             - '@config'
-            - '@template'
             - '@user'
+            - '@template'
+            - '@notification_manager'
         tags:
             - { name: event.listener }
     vinabb.happyanniversary.notification.type.happy_anniversary:
-        class: vinabb\happyanniversary\notification\type\demo
+        class: vinabb\happyanniversary\notification\type\happy_anniversary
         shared: false
         arguments:
             - '@user_loader'

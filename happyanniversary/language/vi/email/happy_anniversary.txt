@@ -1,0 +1,7 @@
+Subject: Happy Membership Anniversary
+
+Hello, {USERNAME}
+
+
+
+{EMAIL_SIG}
