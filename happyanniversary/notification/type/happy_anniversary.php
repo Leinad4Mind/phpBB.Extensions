@@ -95,11 +95,20 @@ class happy_anniversary extends \phpbb\notification\type\base
 	}
 
 	/**
-	* {@inheritdoc}
+	* Get the user's avatar
+	*
+	* @return string
 	*/
 	public function get_avatar()
 	{
-		return $this->user_loader->get_avatar($this->get_data('user_id'), false, true);
+		$row = array(
+			'avatar'		=> $this->user->data['user_avatar'],
+			'avatar_type'	=> $this->user->data['user_avatar_type'],
+			'avatar_width'	=> $this->user->data['user_avatar_width'],
+			'avatar_height'	=> $this->user->data['user_avatar_height'],
+		);
+
+		return phpbb_get_avatar($row, 'USER_AVATAR', false, false);
 	}
 
 	/**
@@ -119,7 +128,7 @@ class happy_anniversary extends \phpbb\notification\type\base
 	*/
 	public function get_url()
 	{
-		return $this->user_loader->get_username($this->get_data('user_id'), 'profile');
+		return get_username_string('profile', $this->user->data['user_id'], $this->user->data['username'], $this->user->data['user_colour']);
 	}
 
 	/**
