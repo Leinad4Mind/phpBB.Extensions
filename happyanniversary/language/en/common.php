@@ -28,6 +28,6 @@ $lang = array_merge($lang, array(
 	'HAPPY_ANNIVERSARY_EXPLAIN'	=> 'On this day years ago, they found us on the Earth and love begins here.',
 	'HAPPY_ANNIVERSARY_TEXT'	=> '<abbr title="%1$s">Congratulations to:</abbr> <strong>%2$s</strong>',
 
-	'NOTIFICATION_HAPPY_ANNIVERSARY'		=> 'Awesome, %1$s! It is a great honour to be with you today to celebrate the %2$d-year membership anniversary.',
+	'NOTIFICATION_HAPPY_ANNIVERSARY'		=> '%1$s, it is a great honour to be with you today to celebrate the %2$d-year membership anniversary.',
 	'NOTIFICATION_TYPE_HAPPY_ANNIVERSARY'	=> 'Membership anniversary day',
 ));

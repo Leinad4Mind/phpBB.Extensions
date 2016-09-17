@@ -12,7 +12,7 @@ services:
             - { name: event.listener }
     vinabb.happyanniversary.notification.type.happy_anniversary:
         class: vinabb\happyanniversary\notification\type\happy_anniversary
-        shared: false
+        scope: prototype
         arguments:
             - '@user_loader'
             - '@dbal.conn'
@@ -25,7 +25,5 @@ services:
             - '%tables.notification_types%'
             - '%tables.notifications%'
             - '%tables.user_notifications%'
-        calls:
-            - [set_controller_helper, ['@controller.helper']]
         tags:
             - { name: notification.type }

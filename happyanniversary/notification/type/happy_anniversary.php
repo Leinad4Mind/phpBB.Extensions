@@ -10,20 +10,6 @@ namespace vinabb\happyanniversary\notification\type;
 
 class happy_anniversary extends \phpbb\notification\type\base
 {
-	/** @var \phpbb\controller\helper */
-	protected $helper;
-
-	/**
-	* Set the controller helper
-	*
-	* @param \phpbb\controller\helper $helper
-	* @return null
-	*/
-	public function set_controller_helper(\phpbb\controller\helper $helper)
-	{
-		$this->helper = $helper;
-	}
-
 	/**
 	* Get notification type name
 	*
@@ -33,11 +19,6 @@ class happy_anniversary extends \phpbb\notification\type\base
 	{
 		return 'vinabb.happyanniversary.notification.type.happy_anniversary';
 	}
-
-	/**
-	* {@inheritdoc}
-	*/
-	protected $language_key = 'NOTIFICATION_HAPPY_ANNIVERSARY';
 
 	/**
 	* Notification option data (for outputting to the user)
@@ -66,9 +47,10 @@ class happy_anniversary extends \phpbb\notification\type\base
 	* @param array $data The data for the updated rules
 	* @return int Id of the notification
 	*/
-	public static function get_item_id($user)
+	public static function get_item_id($data)
 	{
-		return (int) $user['user_id'];
+		// Store the current year as item_id for notification, it displays only once each year
+		return date('Y', time());
 	}
 
 	/**
@@ -95,7 +77,20 @@ class happy_anniversary extends \phpbb\notification\type\base
 	*/
 	public function find_users_for_notification($data, $options = array())
 	{
-		// Return an array of users to be notified, storing the user_ids as the array keys
+		$options = array_merge(array(
+			'ignore_users'		=> array(),
+		), $options);
+
+		return $this->check_user_notification_options(array($data['user_id']), $options);
+	}
+
+	/**
+	* Users needed to query before this notification can be displayed
+	*
+	* @return array Array of user_ids
+	*/
+	public function users_to_query()
+	{
 		return array();
 	}
 
@@ -104,7 +99,7 @@ class happy_anniversary extends \phpbb\notification\type\base
 	*/
 	public function get_avatar()
 	{
-		return $this->user_loader->get_avatar($this->item_id, false, true);
+		return $this->user_loader->get_avatar($this->get_data('user_id'), false, true);
 	}
 
 	/**
@@ -114,9 +109,17 @@ class happy_anniversary extends \phpbb\notification\type\base
 	*/
 	public function get_title()
 	{
-		$username = $this->user_loader->get_username($this->item_id, 'no_profile');
+		return $this->user->lang('NOTIFICATION_HAPPY_ANNIVERSARY', $this->get_data('username'), $this->get_data('years'));
+	}
 
-		return $this->user->lang($this->language_key, $username);
+	/**
+	* Get the url to this item
+	*
+	* @return string URL
+	*/
+	public function get_url()
+	{
+		return $this->user_loader->get_username($this->get_data('user_id'), 'profile');
 	}
 
 	/**
@@ -126,38 +129,21 @@ class happy_anniversary extends \phpbb\notification\type\base
 	*/
 	public function get_email_template()
 	{
-		return 'happy_anniversary';
+		return '@vinabb_happyanniversary/happy_anniversary';
 	}
 
 	/**
-	* {@inheritdoc}
+	* Get email template variables
+	*
+	* @return array
 	*/
 	public function get_email_template_variables()
 	{
-		$board_url = generate_board_url();
-		$username = $this->user_loader->get_username($this->item_id, 'username');
-
 		return array(
-			'USERNAME'	=> htmlspecialchars_decode($username),
-			'U_BOARD'	=> $board_url,
+			'USERNAME'	=> htmlspecialchars_decode($this->get_data('username')),
 			'YEARS'		=> $this->get_data('years'),
+			'U_BOARD'	=> generate_board_url(),
 		);
-	}
-
-	/**
-	* {@inheritdoc}
-	*/
-	public function get_url()
-	{
-		return $this->user_loader->get_username($this->item_id, 'profile');
-	}
-
-	/**
-	* {@inheritdoc}
-	*/
-	public function users_to_query()
-	{
-		return array($this->item_id);
 	}
 
 	/**
@@ -169,10 +155,11 @@ class happy_anniversary extends \phpbb\notification\type\base
 	*
 	* @return array Array of data ready to be inserted into the database
 	*/
-	public function create_insert_array($data, $pre_create_data)
+	public function create_insert_array($data, $pre_create_data = array())
 	{
-		$this->set_data('years', $data['years']);
-		//$this->notification_time = $user['user_regdate'];
+		$this->set_data('user_id', (int) $data['user_id']);
+		$this->set_data('username', (string) $data['username']);
+		$this->set_data('years', (int) $data['years']);
 
 		return parent::create_insert_array($data, $pre_create_data);
 	}

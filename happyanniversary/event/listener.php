@@ -162,12 +162,20 @@ class listener implements EventSubscriberInterface
 			$anniversary_data = array();
 			while ($row = $this->db->sql_fetchrow($result))
 			{
+				$years = $now_year - date('Y', $row['user_regdate']);
+
 				$anniversary_data[] = array(
 					'user_id'		=> $row['user_id'],
 					'username'		=> $row['username'],
 					'user_colour'	=> $row['user_colour'],
-					'years'			=> $now_year - date('Y', $row['user_regdate']),
+					'years'			=> $years,
 				);
+
+				$this->notification->add_notifications('vinabb.happyanniversary.notification.type.happy_anniversary', array(
+					'user_id'	=> $row['user_id'],
+					'username'	=> $row['username'],
+					'years'		=> $years,
+				));
 			}
 			$this->db->sql_freeresult($result);
 
@@ -177,11 +185,6 @@ class listener implements EventSubscriberInterface
 		$anniversary_users = '';
 		foreach ($anniversary_data as $anniversary_user)
 		{
-			$this->notification->add_notifications('vinabb.happyanniversary.notification.type.happy_anniversary', array(
-				'user_id'	=> $anniversary_user['user_id'],
-				'years'		=> $anniversary_user['years'],
-			));
-
 			$anniversary_users .= (empty($anniversary_users) ? '' : ', ') . get_username_string('full', $anniversary_user['user_id'], $anniversary_user['username'], $anniversary_user['user_colour']) . ' (' . $anniversary_user['years'] . ')';
 		}
 

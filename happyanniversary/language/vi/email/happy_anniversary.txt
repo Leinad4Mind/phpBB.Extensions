@@ -2,6 +2,7 @@ Subject: Happy Membership Anniversary
 
 Hello, {USERNAME}
 
-
+{U_BOARD}
+{YEARS}
 
 {EMAIL_SIG}
