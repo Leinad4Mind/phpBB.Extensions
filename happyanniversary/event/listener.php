@@ -87,13 +87,18 @@ class listener implements EventSubscriberInterface
 	*/
 	public function index_modify_page_title($event)
 	{
-		echo $this->board_strtotime() . "<br>";
-		echo time();
 		$anniversary_data = $this->cache->get('_vinabb_happyanniversary_data');
 
-		if ($anniversary_data === false)
+		// When do need to refresh cache?
+		$time = time();
+		$next_time = strtotime('+1 day');
+		$expired_year = date('Y', $next_time);
+		$expired_month = date('m', $next_time);
+		$expired_day = date('d', $next_time);
+		$expired_time = strtotime("{$expired_day}-{$expired_month}-{$expired_year} 00:00:00");
+
+		if ($anniversary_data === false || $time > $expired_time)
 		{
-			$time = $this->board_strtotime();
 			$now = phpbb_gmgetdate($time);
 
 			// Get the begin year
@@ -103,7 +108,7 @@ class listener implements EventSubscriberInterface
 			$min_user_regdate = $this->db->sql_fetchfield('min_user_regdate');
 			$this->db->sql_freeresult($result);
 
-			$min_year = date('Y', $this->board_strtotime(date('d-m-Y', $min_user_regdate)));
+			$min_year = date('Y', $min_user_regdate);
 			$now_year = date('Y', $time);
 			$now_month = date('m', $time);
 			$now_day = date('d', $time);
@@ -116,7 +121,7 @@ class listener implements EventSubscriberInterface
 				for ($i; $i >= $min_year; $i--)
 				{
 					$sql_or .= (empty($sql_or) ? '' : ' OR ');
-					$sql_or .= '(u.user_regdate > ' . ($this->board_strtotime("{$now_day}-{$now_month}-{$i} 00:00:00") - 1) . ' AND u.user_regdate < ' . ($this->board_strtotime("{$now_day}-{$now_month}-{$i} 23:59:59") + 1) . ')';
+					$sql_or .= '(u.user_regdate > ' . (strtotime("{$now_day}-{$now_month}-{$i} 00:00:00") - 1) . ' AND u.user_regdate < ' . (strtotime("{$now_day}-{$now_month}-{$i} 23:59:59") + 1) . ')';
 				}
 			}
 			$sql_and = empty($sql_or) ? '0' : "($sql_or)";
@@ -155,19 +160,12 @@ class listener implements EventSubscriberInterface
 					'user_id'		=> $row['user_id'],
 					'username'		=> $row['username'],
 					'user_colour'	=> $row['user_colour'],
-					'years'			=> $now_year - date('Y', $this->board_strtotime(date('d-m-Y', $row['user_regdate']))),
+					'years'			=> $now_year - date('Y', $row['user_regdate']),
 				);
 			}
 			$this->db->sql_freeresult($result);
 
-			// When do need to refresh cache?
-			$next_time = $this->board_strtotime('+1 day');
-			$expired_year = date('Y', $next_time);
-			$expired_month = date('m', $next_time);
-			$expired_day = date('d', $next_time);
-			$expired_seconds = $this->board_strtotime("{$expired_day}-{$expired_month}-{$expired_year} 00:00:00") - $this->board_strtotime();
-
-			$this->cache->put('_vinabb_happyanniversary_data', $anniversary_data, $expired_seconds);
+			$this->cache->put('_vinabb_happyanniversary_data', $anniversary_data, $expired_time - $time);
 		}
 
 		$anniversary_users = '';
@@ -179,16 +177,5 @@ class listener implements EventSubscriberInterface
 		$this->template->assign_vars(array(
 			'HAPPY_ANNIVERSARY_TEXT'	=> !empty($anniversary_users) ? $this->user->lang('HAPPY_ANNIVERSARY_TEXT', $this->user->lang('HAPPY_ANNIVERSARY_EXPLAIN'), $anniversary_users) : '',
 		));
-	}
-
-	/**
-	* Convert string to UNIX timestamp, but using the default timezone of board
-	*
-	* @param string $string
-	* @return int
-	*/
-	protected function board_strtotime($string = 'now')
-	{
-		return $this->user->create_datetime($string, new \DateTimeZone($this->config['board_timezone']))->getTimestamp();
 	}
 }

@@ -9,3 +9,22 @@ services:
             - '@user'
         tags:
             - { name: event.listener }
+    vinabb.happyanniversary.notification.type.happy_anniversary:
+        class: vinabb\happyanniversary\notification\type\demo
+        shared: false
+        arguments:
+            - '@user_loader'
+            - '@dbal.conn'
+            - '@cache.driver'
+            - '@user'
+            - '@auth'
+            - '@config'
+            - '%core.root_path%'
+            - '%core.php_ext%'
+            - '%tables.notification_types%'
+            - '%tables.notifications%'
+            - '%tables.user_notifications%'
+        calls:
+            - [set_controller_helper, ['@controller.helper']]
+        tags:
+            - { name: notification.type }
