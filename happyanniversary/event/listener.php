@@ -189,7 +189,7 @@ class listener implements EventSubscriberInterface
 		}
 
 		$this->template->assign_vars(array(
-			'HAPPY_ANNIVERSARY_TEXT'	=> !empty($anniversary_users) ? $this->user->lang('HAPPY_ANNIVERSARY_TEXT', $this->user->lang('HAPPY_ANNIVERSARY_EXPLAIN'), $anniversary_users) : '',
+			'HAPPY_ANNIVERSARY_TEXT'	=> !empty($anniversary_users) ? $this->user->lang('HAPPY_ANNIVERSARY_TEXT', $anniversary_users) : '',
 		));
 	}
 }

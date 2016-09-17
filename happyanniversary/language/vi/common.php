@@ -25,8 +25,7 @@ if (empty($lang) || !is_array($lang))
 */
 $lang = array_merge($lang, array(
 	'HAPPY_ANNIVERSARY'			=> 'Kỷ niệm ngày tham gia',
-	'HAPPY_ANNIVERSARY_EXPLAIN'	=> 'Vào ngày này những năm trước, họ đã tìm thấy chúng tôi trên mạng và tình yêu bắt đầu từ đây.',
-	'HAPPY_ANNIVERSARY_TEXT'	=> '<abbr title="%1$s">Thành viên:</abbr> <strong>%2$s</strong>',
+	'HAPPY_ANNIVERSARY_TEXT'	=> 'Thành viên: <strong>%s</strong>',
 
 	'NOTIFICATION_HAPPY_ANNIVERSARY'		=> '%1$s, chúc mừng ngày kỷ niệm %2$d năm thành viên của bạn.',
 	'NOTIFICATION_TYPE_HAPPY_ANNIVERSARY'	=> 'Chúc mừng ngày kỷ niệm thành viên',
