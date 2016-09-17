@@ -161,33 +161,29 @@ class listener implements EventSubscriberInterface
 			$anniversary_data = array();
 			while ($row = $this->db->sql_fetchrow($result))
 			{
-				$years = $now_year - date('Y', $row['user_regdate']);
-
-				$anniversary_data[] = array(
-					'user_id'		=> $row['user_id'],
+				$anniversary_data[$row['user_id']] = array(
 					'username'		=> $row['username'],
 					'user_colour'	=> $row['user_colour'],
-					'years'			=> $years,
+					'years'			=> $now_year - date('Y', $row['user_regdate']),
 				);
-
-				// Push a notification and/or send an email to the user
-				$this->notification->add_notifications('vinabb.happyanniversary.notification.type.happy_anniversary', array(
-					'user_id'	=> $row['user_id'],
-					'username'	=> $row['username'],
-					'years'		=> $years,
-				));
 			}
 			$this->db->sql_freeresult($result);
 
-			// THe next day, how many seconds left?
+			// Push a notification and/or send an email to the user
+			if (sizeof($anniversary_data))
+			{
+				$this->notification->add_notifications('vinabb.happyanniversary.notification.type.happy_anniversary', $anniversary_data);
+			}
+
+			// The next day, how many seconds left?
 			$this->cache->put('_vinabb_happyanniversary_data', $anniversary_data, $expired_time - $time);
 		}
 
 		// Get the list of anniversary users
 		$anniversary_users = '';
-		foreach ($anniversary_data as $anniversary_user)
+		foreach ($anniversary_data as $user_id => $user_data)
 		{
-			$anniversary_users .= (empty($anniversary_users) ? '' : ', ') . get_username_string('full', $anniversary_user['user_id'], $anniversary_user['username'], $anniversary_user['user_colour']) . ' (' . $anniversary_user['years'] . ')';
+			$anniversary_users .= (empty($anniversary_users) ? '' : ', ') . get_username_string('full', $user_id, $user_data['username'], $user_data['user_colour']) . ' (' . $user_data['years'] . ')';
 		}
 
 		// Output

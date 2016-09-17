@@ -81,7 +81,7 @@ class happy_anniversary extends \phpbb\notification\type\base
 			'ignore_users'		=> array(),
 		), $options);
 
-		return $this->check_user_notification_options(array($data['user_id']), $options);
+		return $this->check_user_notification_options(array_keys($data), $options);
 	}
 
 	/**
@@ -118,7 +118,9 @@ class happy_anniversary extends \phpbb\notification\type\base
 	*/
 	public function get_title()
 	{
-		return $this->user->lang('NOTIFICATION_HAPPY_ANNIVERSARY', $this->get_data('username'), $this->get_data('years'));
+		$data = $this->get_data('anniversary');
+
+		return $this->user->lang('NOTIFICATION_HAPPY_ANNIVERSARY', $data[$this->user_id]['username'], $data[$this->user_id]['years']);
 	}
 
 	/**
@@ -148,9 +150,11 @@ class happy_anniversary extends \phpbb\notification\type\base
 	*/
 	public function get_email_template_variables()
 	{
+		$data = $this->get_data('anniversary');
+
 		return array(
-			'USERNAME'	=> htmlspecialchars_decode($this->get_data('username')),
-			'YEARS'		=> $this->get_data('years'),
+			'USERNAME'	=> htmlspecialchars_decode($data[$this->user_id]['username']),
+			'YEARS'		=> $data[$this->user_id]['years'],
 			'U_BOARD'	=> generate_board_url(),
 		);
 	}
@@ -166,9 +170,7 @@ class happy_anniversary extends \phpbb\notification\type\base
 	*/
 	public function create_insert_array($data, $pre_create_data = array())
 	{
-		$this->set_data('user_id', (int) $data['user_id']);
-		$this->set_data('username', (string) $data['username']);
-		$this->set_data('years', (int) $data['years']);
+		$this->set_data('anniversary', $data);
 
 		return parent::create_insert_array($data, $pre_create_data);
 	}
