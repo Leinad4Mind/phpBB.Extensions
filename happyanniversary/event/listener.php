@@ -19,10 +19,10 @@ class listener implements EventSubscriberInterface
 	protected $cache;
 
 	/** @var \phpbb\config\config */
-    protected $config;
+	protected $config;
 
 	/** @var \phpbb\user */
-    protected $user;
+	protected $user;
 
 	/** @var \phpbb\language\language */
 	protected $language;
