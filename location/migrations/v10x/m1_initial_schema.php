@@ -22,7 +22,7 @@ class m1_initial_schema extends \phpbb\db\migration\migration
 	public function update_schema()
 	{
 		// Geographic Decimal: decimal(10,6)
-		switch($this->db->get_sql_layer())
+		switch ($this->db->get_sql_layer())
 		{
 			case 'mysql':
 			case 'mysql4':
