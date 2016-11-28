@@ -2,13 +2,13 @@ services:
     vinabb.happyanniversary.listener:
         class: vinabb\happyanniversary\event\listener
         arguments:
-            - '@dbal.conn'
             - '@cache.driver'
             - '@config'
-            - '@user'
+            - '@dbal.conn'
             - '@language'
-            - '@template'
             - '@notification_manager'
+            - '@template'
+            - '@user'
         tags:
             - { name: event.listener }
     vinabb.happyanniversary.notification.type.happy_anniversary:
