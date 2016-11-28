@@ -64,10 +64,10 @@ class listener implements EventSubscriberInterface
 	*/
 	static public function getSubscribedEvents()
 	{
-		return array(
+		return [
 			'core.user_setup'				=> 'user_setup',
-			'core.index_modify_page_title'	=> 'index_modify_page_title',
-		);
+			'core.index_modify_page_title'	=> 'index_modify_page_title'
+		];
 	}
 
 	/**
@@ -79,10 +79,10 @@ class listener implements EventSubscriberInterface
 	{
 		// Add our common language variables
 		$lang_set_ext = $event['lang_set_ext'];
-		$lang_set_ext[] = array(
+		$lang_set_ext[] = [
 			'ext_name' => 'vinabb/happyanniversary',
-			'lang_set' => 'common',
-		);
+			'lang_set' => 'common'
+		];
 		$event['lang_set_ext'] = $lang_set_ext;
 	}
 
@@ -95,77 +95,26 @@ class listener implements EventSubscriberInterface
 	{
 		$anniversary_data = $this->cache->get('_vinabb_happyanniversary_data');
 
-		// When do need to refresh cache?
 		$time = time();
+		$now_year = date('Y', $time);
+
+		// When do need to refresh cache?
 		$next_time = strtotime('+1 day');
-		$expired_year = date('Y', $next_time);
-		$expired_month = date('m', $next_time);
-		$expired_day = date('d', $next_time);
-		$expired_time = strtotime("{$expired_day}-{$expired_month}-{$expired_year} 00:00:00");
+		$expired_time = strtotime(date('d', $next_time) . '-' . date('m', $next_time) . '-'. date('Y', $next_time) . ' 00:00:00');
 
-		if ($anniversary_data === false || $time > $expired_time)
+		if ($now_year > $this->config['vinabb_happyanniversary_begin_year'] && ($anniversary_data === false || $time > $expired_time))
 		{
-			// Get the begin year
-			$sql = 'SELECT MIN(user_regdate) as min_user_regdate
-				FROM ' . USERS_TABLE;
-			$result = $this->db->sql_query($sql);
-			$min_user_regdate = $this->db->sql_fetchfield('min_user_regdate');
-			$this->db->sql_freeresult($result);
-
-			$min_year = date('Y', $min_user_regdate);
-			$now_year = date('Y', $time);
-			$now_month = date('m', $time);
-			$now_day = date('d', $time);
-
-			// Does Time Machine already exist?
-			$sql_or = '';
-			if ($now_year > $min_year)
-			{
-				$i = $now_year - 1;
-
-				for ($i; $i >= $min_year; $i--)
-				{
-					$sql_or .= (empty($sql_or) ? '' : ' OR ');
-					$sql_or .= '(u.user_regdate > ' . (strtotime("{$now_day}-{$now_month}-{$i} 00:00:00") - 1) . ' AND u.user_regdate < ' . (strtotime("{$now_day}-{$now_month}-{$i} 23:59:59") + 1) . ')';
-				}
-
-				// Display anniversary of 29th february on 28th february in non-leap-years
-				if ($now_day == '28' && $now_day == '02' && !date('L', $time) && date('L', strtotime("01-01-{$i}")))
-				{
-					$sql_or .= (empty($sql_or) ? '' : ' OR ');
-					$sql_or .= '(u.user_regdate > ' . (strtotime("29-02-{$i} 00:00:00") - 1) . ' AND u.user_regdate < ' . (strtotime("29-02-{$i} 23:59:59") + 1) . ')';
-				}
-			}
-			$sql_and = empty($sql_or) ? '0' : "($sql_or)";
-
-			// Build the query
-			$sql_ary = array(
-				'SELECT' => 'u.user_id, u.username, u.user_colour, u.user_regdate',
-				'FROM' => array(
-					USERS_TABLE => 'u',
-				),
-				'LEFT_JOIN' => array(
-					array(
-						'FROM' => array(BANLIST_TABLE => 'b'),
-						'ON' => 'u.user_id = b.ban_userid',
-					),
-				),
-				'WHERE' => '(b.ban_id IS NULL OR b.ban_exclude = 1)
-					AND ' . $this->db->sql_in_set('u.user_type', array(USER_NORMAL, USER_FOUNDER)) . "
-					AND $sql_and",
-				'ORDER_BY'	=> 'u.user_regdate',
-			);
-			$sql = $this->db->sql_build_query('SELECT', $sql_ary);
+			$sql = $this->db->sql_build_query('SELECT', $this->build_sql($time));
 			$result = $this->db->sql_query($sql);
 
-			$anniversary_data = array();
+			$anniversary_data = [];
 			while ($row = $this->db->sql_fetchrow($result))
 			{
-				$anniversary_data[$row['user_id']] = array(
+				$anniversary_data[$row['user_id']] = [
 					'username'		=> $row['username'],
 					'user_colour'	=> $row['user_colour'],
-					'years'			=> $now_year - date('Y', $row['user_regdate']),
-				);
+					'years'			=> $now_year - date('Y', $row['user_regdate'])
+				];
 			}
 			$this->db->sql_freeresult($result);
 
@@ -183,12 +132,61 @@ class listener implements EventSubscriberInterface
 		$anniversary_users = '';
 		foreach ($anniversary_data as $user_id => $user_data)
 		{
-			$anniversary_users .= (empty($anniversary_users) ? '' : ', ') . get_username_string('full', $user_id, $user_data['username'], $user_data['user_colour']) . ' (' . $user_data['years'] . ')';
+			$anniversary_users .= (($anniversary_users == '') ? '' : ', ') . get_username_string('full', $user_id, $user_data['username'], $user_data['user_colour']) . ' (' . $user_data['years'] . ')';
 		}
 
 		// Output
-		$this->template->assign_vars(array(
-			'HAPPY_ANNIVERSARY_TEXT'	=> !empty($anniversary_users) ? $this->user->lang('HAPPY_ANNIVERSARY_TEXT', $anniversary_users) : '',
-		));
+		$this->template->assign_var('HAPPY_ANNIVERSARY_TEXT', ($anniversary_users != '') ? $this->user->lang('HAPPY_ANNIVERSARY_TEXT', $anniversary_users) : '');
+	}
+
+	/**
+	* Build SQL query for anniversary users
+	*
+	* @param int $time Timestamp
+	* @return array
+	*/
+	protected function build_sql($time)
+	{
+		// Current date
+		$now_year = date('Y', $time);
+		$now_month = date('m', $time);
+		$now_day = date('d', $time);
+
+		// Does Time Machine already exist?
+		$sql_or = '';
+		$i = $now_year - 1;
+
+		for ($i; $i >= $this->config['vinabb_happyanniversary_begin_year']; $i--)
+		{
+			$sql_or .= ($sql_or == '') ? '' : ' OR ';
+			$sql_or .= '(u.user_regdate > ' . (strtotime("{$now_day}-{$now_month}-{$i} 00:00:00") - 1) . ' AND u.user_regdate < ' . (strtotime("{$now_day}-{$now_month}-{$i} 23:59:59") + 1) . ')';
+		}
+
+		// Display anniversary of 29th february on 28th february in non-leap-years
+		if ($now_day == '28' && $now_day == '02' && !date('L', $time) && date('L', strtotime("01-01-{$i}")))
+		{
+			$sql_or .= ($sql_or == '') ? '' : ' OR ';
+			$sql_or .= '(u.user_regdate > ' . (strtotime("29-02-{$i} 00:00:00") - 1) . ' AND u.user_regdate < ' . (strtotime("29-02-{$i} 23:59:59") + 1) . ')';
+		}
+
+		$sql_and = ($sql_or == '') ? '0' : "($sql_or)";
+
+		// Build the query
+		$sql_ary = [
+			'SELECT' => 'u.user_id, u.username, u.user_colour, u.user_regdate',
+			'FROM' => [USERS_TABLE => 'u'],
+			'LEFT_JOIN' => [
+				[
+					'FROM' => [BANLIST_TABLE => 'b'],
+					'ON' => 'u.user_id = b.ban_userid'
+				]
+			],
+			'WHERE' => '(b.ban_id IS NULL OR b.ban_exclude = 1)
+					AND ' . $this->db->sql_in_set('u.user_type', [USER_NORMAL, USER_FOUNDER]) . "
+					AND $sql_and",
+			'ORDER_BY'	=> 'u.user_regdate',
+		];
+
+		return $sql_ary;
 	}
 }
