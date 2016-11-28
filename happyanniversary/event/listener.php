@@ -76,7 +76,7 @@ class listener implements EventSubscriberInterface
 	/**
 	* core.user_setup
 	*
-	* @param $event $event Data from the PHP event
+	* @param array $event Data from the PHP event
 	*/
 	public function user_setup($event)
 	{
@@ -92,7 +92,7 @@ class listener implements EventSubscriberInterface
 	/**
 	* core.index_modify_page_title
 	*
-	* @param $event $event Data from the PHP event
+	* @param array $event Data from the PHP event
 	*/
 	public function index_modify_page_title($event)
 	{
