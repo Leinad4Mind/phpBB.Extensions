@@ -16,7 +16,6 @@ class ext extends \phpbb\extension\base
 	*
 	* @param mixed $old_state State returned by previous call of this method
 	* @return mixed Returns false after last step, otherwise temporary state
-	* @access public
 	*/
 	public function enable_step($old_state)
 	{
@@ -27,14 +26,11 @@ class ext extends \phpbb\extension\base
 				// Enable notifications
 				$notification = $this->container->get('notification_manager');
 				$notification->enable_notifications('vinabb.happyanniversary.notification.type.happy_anniversary');
-
-				return 'notifications';
-			break;
+			return 'notifications';
 
 			default:
-				// Run parent enable step method
-				return parent::enable_step($old_state);
-			break;
+			// Run parent enable step method
+			return parent::enable_step($old_state);
 		}
 	}
 
@@ -44,7 +40,6 @@ class ext extends \phpbb\extension\base
 	*
 	* @param mixed $old_state State returned by previous call of this method
 	* @return mixed Returns false after last step, otherwise temporary state
-	* @access public
 	*/
 	public function disable_step($old_state)
 	{
@@ -55,14 +50,11 @@ class ext extends \phpbb\extension\base
 				// Disable notifications
 				$notification = $this->container->get('notification_manager');
 				$notification->disable_notifications('vinabb.happyanniversary.notification.type.happy_anniversary');
-
-				return 'notifications';
-			break;
+			return 'notifications';
 
 			default:
-				// Run parent disable step method
-				return parent::disable_step($old_state);
-			break;
+			// Run parent disable step method
+			return parent::disable_step($old_state);
 		}
 	}
 
@@ -72,7 +64,6 @@ class ext extends \phpbb\extension\base
 	*
 	* @param mixed $old_state State returned by previous call of this method
 	* @return mixed Returns false after last step, otherwise temporary state
-	* @access public
 	*/
 	public function purge_step($old_state)
 	{
@@ -83,14 +74,11 @@ class ext extends \phpbb\extension\base
 				// Purge notifications
 				$notification = $this->container->get('notification_manager');
 				$notification->purge_notifications('vinabb.happyanniversary.notification.type.happy_anniversary');
-
-				return 'notifications';
-			break;
+			return 'notifications';
 
 			default:
-				// Run parent purge step method
-				return parent::purge_step($old_state);
-			break;
+			// Run parent purge step method
+			return parent::purge_step($old_state);
 		}
 	}
 }
