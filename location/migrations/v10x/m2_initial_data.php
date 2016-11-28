@@ -16,38 +16,25 @@ class m2_initial_data extends \phpbb\db\migration\migration
 	/**
 	* Assign migration file dependencies for this migration
 	*
-	* @return array Array of migration files
-	* @static
-	* @access public
+	* @return array
 	*/
 	static public function depends_on()
 	{
-		return array('\nedka\location\migrations\v10x\m1_initial_schema');
+		return ['\nedka\location\migrations\v10x\m1_initial_schema'];
 	}
 
 	/**
 	* Add or update data in the database
 	*
-	* @return array Array of table data
-	* @access public
+	* @return array
 	*/
 	public function update_data()
 	{
-		return array(
-			//array('custom', array(array($this, 'insert_continent_data'))),
-			array('custom', array(array($this, 'insert_country_data'))),
-			//array('custom', array(array($this, 'insert_unit_data'))),
-			//array('custom', array(array($this, 'insert_language_data'))),
-			//array('custom', array(array($this, 'insert_script_data'))),
-			//array('custom', array(array($this, 'insert_currency_data'))),
-		);
+		return [['custom', [[$this, 'insert_country_data']]]];
 	}
 
 	/**
 	* Add countries to the database
-	*
-	* @return null
-	* @access public
 	*/
 	public function insert_country_data()
 	{
@@ -55,8 +42,8 @@ class m2_initial_data extends \phpbb\db\migration\migration
 		$insert_buffer = new \phpbb\db\sql_insert_buffer($this->db, $this->table_prefix . 'countries');
 
 		// Prepare data
-		$country_data = array(
-			array(
+		$country_data = [
+			[
 				'continent'		=> 'AS',
 				'code'			=> 'AF',
 				'name'			=> 'Afghanistan',
@@ -77,14 +64,14 @@ class m2_initial_data extends \phpbb\db\migration\migration
 				'date'			=> '1919-08-19',
 				'flag'			=> 'af.svg',
 				'timezone'		=> 'Asia/Kabul',
-				'enabled'		=> true,
-			),
-		);
+				'enabled'		=> true
+			]
+		];
 
 		// Insert data
 		foreach ($country_data as $data)
 		{
-			$insert_buffer->insert(array(
+			$insert_buffer->insert([
 				'continent_code'		=> $data['continent'],
 				'country_code'			=> $data['code'],
 				'country_name'			=> $data['name'],
@@ -106,7 +93,7 @@ class m2_initial_data extends \phpbb\db\migration\migration
 				'country_flag'			=> $data['flag'],
 				'country_timezone'		=> $data['timezone'],
 				'country_enabled'		=> $data['enabled'],
-			));
+			]);
 		}
 
 		// Flush the buffer

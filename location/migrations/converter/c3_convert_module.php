@@ -17,7 +17,6 @@ class c3_convert_module extends \phpbb\db\migration\migration
 	* Skip this migration if an ACP_FLAGS module does not exist
 	*
 	* @return bool True to skip this migration, false to run it
-	* @access public
 	*/
 	public function effectively_installed()
 	{
@@ -36,17 +35,16 @@ class c3_convert_module extends \phpbb\db\migration\migration
 	/**
 	* Add or update data in the database
 	*
-	* @return array Array of table data
-	* @access public
+	* @return array
 	*/
 	public function update_data()
 	{
-		return array(
+		return [
 			// Remove old ACP_FLAGS module if it exists
-			array('if', array(
-				array('module.exists', array('acp', false, 'ACP_FLAGS')),
-				array('module.remove', array('acp', false, 'ACP_FLAGS')),
-			)),
-		);
+			['if', [
+				['module.exists', ['acp', false, 'ACP_FLAGS']],
+				['module.remove', ['acp', false, 'ACP_FLAGS']]
+			]]
+		];
 	}
 }

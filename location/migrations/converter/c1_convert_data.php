@@ -18,7 +18,6 @@ class c1_convert_data extends \phpbb\db\migration\migration
 	* exist, or our pages table is already installed
 	*
 	* @return bool True to skip this migration, false to run it
-	* @access public
 	*/
 	public function effectively_installed()
 	{
@@ -28,40 +27,28 @@ class c1_convert_data extends \phpbb\db\migration\migration
 	/**
 	* Assign migration file dependencies for this migration
 	*
-	* @return array Array of migration files
-	* @static
-	* @access public
+	* @return array
 	*/
 	static public function depends_on()
 	{
-		return array(
-			'\nedka\location\migrations\v10x\m1_initial_schema',
-		);
+		return ['\nedka\location\migrations\v10x\m1_initial_schema'];
 	}
 
 	/**
 	* Add or update data in the database
 	*
-	* @return array Array of table data
-	* @access public
+	* @return array
 	*/
 	public function update_data()
 	{
-		return array(
-			array('custom', array(array($this, 'convert_data'))),
-		);
+		return [['custom', [[$this, 'convert_data']]]];
 	}
 
 	/**
 	* Custom function to convert and add data
-	*
-	* @return null
-	* @access public
 	*/
 	public function convert_data()
 	{
-		$import_data = array();
-
 		// Get data from old column, also convert country codes to UPPERCASE
 		$this->db->sql_query('UPDATE ' . $this->table_prefix . 'users SET user_location = UPPER(user_flag)');
 

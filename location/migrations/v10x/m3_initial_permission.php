@@ -16,18 +16,14 @@ class m3_initial_permission extends \phpbb\db\migration\migration
 	/**
 	* Add or update data in the database
 	*
-	* @return array Array of table data
-	* @access public
+	* @return array
 	*/
 	public function update_data()
 	{
-		return array(
-			// Add permission
-			array('permission.add', array('a_location', true)),
-
-			// Set permissions
-			array('permission.permission_set', array('ROLE_ADMIN_FULL', 'a_location')),
-			array('permission.permission_set', array('ROLE_ADMIN_STANDARD', 'a_location')),
-		);
+		return [
+			['permission.add', ['a_location', true]],
+			['permission.permission_set', ['ROLE_ADMIN_FULL', 'a_location']],
+			['permission.permission_set', ['ROLE_ADMIN_STANDARD', 'a_location']]
+		];
 	}
 }
