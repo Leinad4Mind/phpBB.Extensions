@@ -9,6 +9,7 @@
 namespace vinabb\emojismilies\event;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use vinabb\emojismilies\includes\constants;
 
 /**
 * PHP events
@@ -79,25 +80,27 @@ class listener implements EventSubscriberInterface
 		// Remove old smiley data
 		unset($configurator->Emoticons);
 
+		$emoji = $this->smiley_to_emoji();
+
 		// Set new smiley data with emoticon based on user language
 		foreach ($this->get_smilies() as $smiley_code => $smiley_data)
 		{
-			if ($this->language->is_set(['EMOTICON_TEXT', strtoupper($smiley_data['emotion'])]))
+			if ($this->config['vinabb_emojismilies_smiley_type'])
 			{
-				$emotion_text = '{$LE_' . strtoupper($smiley_data['emotion']) . '}';
+				$configurator->Emoji->addAlias($smiley_code, $emoji[$smiley_data['emotion']]);
 			}
 			else
 			{
-				$emotion_text = $smiley_data['emotion'];
-			}
+				$emotion_text = $this->language->is_set(['EMOTICON_TEXT', strtoupper($smiley_data['emotion'])]) ? '{$LE_' . strtoupper($smiley_data['emotion']) . '}' : $smiley_data['emotion'];
 
-			$configurator->Emoticons->add($smiley_code, '<img class="smilies" src="{$T_SMILIES_PATH}/' . $smiley_data['url'] . '" width="' . $smiley_data['width'] . '" height="' . $smiley_data['height'] . '" alt="{.}" title="' . $emotion_text . '"/>');
+				$configurator->Emoticons->add($smiley_code, '<img class="smilies" src="{$T_SMILIES_PATH}/' . $smiley_data['url'] . '" width="' . $smiley_data['width'] . '" height="' . $smiley_data['height'] . '" alt="{.}" title="' . $emotion_text . '">');
+			}
 		}
 
 		if (isset($configurator->Emoticons))
 		{
 			// Force emoticons to be rendered as text if $S_VIEWSMILIES is not set
-			$configurator->Emoticons->notIfCondition = 'not($S_VIEWSMILIES)';
+			$configurator->Emoticons->notIfCondition = $this->config['vinabb_emojismilies_smiley_type'] ? '$S_VIEWSMILIES' : 'not($S_VIEWSMILIES)';
 
 			// Only parse emoticons at the beginning of the text or if they're preceded by any
 			// one of: a new line, a space, a dot, or a right square bracket
@@ -105,8 +108,20 @@ class listener implements EventSubscriberInterface
 		}
 
 		// Use EmojiOne
-		$configurator->Emoji->useEmojiOne();
-		$configurator->Emoji->setImageSize(16);
+		switch ($this->config['vinabb_emojismilies_emoji_type'])
+		{
+			case constants::EMOJI_TYPE_RAW:
+				unset($configurator->Emoji);
+			break;
+
+			case constants::EMOJI_TYPE_EMOJIONE:
+				$configurator->Emoji->useEmojiOne();
+			// No break
+
+			default:
+				$configurator->Emoji->setImageSize(16);
+			break;
+		}
 	}
 
 	protected function get_smilies()
@@ -130,5 +145,88 @@ class listener implements EventSubscriberInterface
 		$this->db->sql_freeresult($result);
 
 		return $rows;
+	}
+
+	protected function smiley_to_emoji()
+	{
+		return [
+			'GRIN'=>'😀',
+			'GRIN_WINK'=>'😁',
+			'GRIN_TEARS'=>'😂',
+			'LOL'=>'🤣',
+			'SMILE_MOUTH'=>'😃',
+			'SMILE_MOUTH_WINK'=>'😄',
+			'SMILE_MOUTH_COLD'=>'😅',
+			'SMILE_MOUTH_MAX'=>'😆',
+			'WINK'=>'😉',
+			'SMILE_WINK'=>'😊',
+			'HUNGRY'=>'😋',
+			'COOL'=>'😎',
+			'HEART'=>'😍',
+			'KISS_LOVE'=>'😘',
+			'KISS'=>'😗',
+			'KISS_WINK'=>'😙',
+			'KISS_BLUSH'=>'😚',
+			'SMILE_WHITE'=>'☺️',
+			'SMILE'=>'🙂',
+			'HUG'=>'🤗',
+			'THINK'=>'🤔',
+			'NEUTRAL'=>'😐',
+			'EXPRESSIONLESS'=>'😑',
+			'NO_MOUTH'=>'😶',
+			'ROLLING_EYES'=>'🙄',
+			'SMIRK'=>'😏',
+			'WTF'=>'😣',
+			'DISAPPOINTED_RELIEVED'=>'😥',
+			'SURPRISED'=>'😮',
+			'CENSORED'=>'🤐',
+			'HUSHED'=>'😯',
+			'SLEEPY'=>'😪',
+			'TIRED'=>'😫',
+			'SLEEP'=>'😴',
+			'RELIEVED'=>'😌',
+			'NERD'=>'🤓',
+			'TONGUE'=>'😛',
+			'TONGUE_WINK'=>'😜',
+			'TONGUE_MAX'=>'😝',
+			'DROOL'=>'🤤',
+			'UNAMUSED'=>'😒',
+			'COLD'=>'😓',
+			'PENSIVE'=>'😔',
+			'CONFUSED'=>'😕',
+			'UPSIDE'=>'🙃',
+			'MONEY'=>'🤑',
+			'ASTONISHED'=>'😲',
+			'SAD_WHITE'=>'☹',
+			'SAD'=>'🙁',
+			'CONFOUNDED'=>'😖',
+			'DISAPPOINTED'=>'😞',
+			'WORRIED'=>'😟',
+			'KEEP_CALM'=>'😤',
+			'CRY'=>'😢',
+			'CRY_MAX'=>'😭',
+			'SAD_MOUTH'=>'😦',
+			'ANGUISHED'=>'😧',
+			'FEARFUL'=>'😨',
+			'WEARY'=>'😩',
+			'GRIMACE'=>'😬',
+			'COLD_MOUTH'=>'😰',
+			'SCREAM'=>'😱',
+			'BLUSH'=>'😳',
+			'DIZZY'=>'😵',
+			'POUT'=>'😡',
+			'ANGRY'=>'😠',
+			'ANGEL'=>'😇',
+			'COWBOY'=>'🤠',
+			'CLOWN'=>'🤡',
+			'LIE'=>'🤥',
+			'SICK'=>'😷',
+			'SICK_FEVER'=>'🤒',
+			'SICK_BANDAGE'=>'🤕',
+			'NAUSEATED'=>'🤢',
+			'SNEEZE'=>'🤧',
+			'DEVIL'=>'😈',
+			'DEVIL_IMP'=>'👿'
+		];
 	}
 }
