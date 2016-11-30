@@ -121,7 +121,7 @@ class listener implements EventSubscriberInterface
 	*/
 	protected function get_cache()
 	{
-		if (($anniversary_data = $this->driver->get('_vinabb_happyanniversary')) === false)
+		if (($anniversary_data = $this->cache->get('_vinabb_happyanniversary')) === false)
 		{
 			$anniversary_data = [];
 		}
