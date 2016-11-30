@@ -12,6 +12,33 @@ use vinabb\emojismilies\includes\constants;
 
 class settings_module
 {
+	/** @var \phpbb\cache\service */
+	protected $cache;
+
+	/** @var \phpbb\config\config */
+	protected $config;
+
+	/** @var \phpbb\language\language */
+	protected $language;
+
+	/** @var \phpbb\log\log */
+	protected $log;
+
+	/** @var \phpbb\request\request */
+	protected $request;
+
+	/** @var \phpbb\template\template */
+	protected $template;
+
+	/** @var \phpbb\user */
+	protected $user;
+
+	/** @var string */
+	public $tpl_name;
+
+	/** @var string */
+	public $page_title;
+
 	/** @var string */
 	public $u_action;
 
@@ -22,12 +49,13 @@ class settings_module
 	{
 		global $phpbb_container;
 
+		$this->cache = $phpbb_container->get('cache');
 		$this->config = $phpbb_container->get('config');
+		$this->language = $phpbb_container->get('language');
 		$this->log = $phpbb_container->get('log');
 		$this->request = $phpbb_container->get('request');
 		$this->template = $phpbb_container->get('template');
 		$this->user = $phpbb_container->get('user');
-		$this->language = $phpbb_container->get('language');
 
 		$this->tpl_name = 'acp_emoji_smilies';
 		$this->page_title = $this->language->lang('ACP_EMOJI_SMILIES');
@@ -57,7 +85,10 @@ class settings_module
 				$this->config->set('vinabb_emojismilies_smiley_type', $smiley_type);
 				$this->config->set('vinabb_emojismilies_emoji_type', $emoji_type);
 
+				$this->cache->purge();
+
 				$this->log->add('admin', $this->user->data['user_id'], $this->user->ip, 'LOG_EMOJI_SMILIES_SETTINGS');
+				$this->log->add('admin', $this->user->data['user_id'], $this->user->ip, 'LOG_PURGE_CACHE');
 
 				trigger_error($this->language->lang('EMOJI_SMILIES_SETTINGS_UPDATED') . adm_back_link($this->u_action));
 			}
