@@ -69,7 +69,7 @@ class m1_initial_schema extends \phpbb\db\migration\migration
 	*
 	* @return array
 	*/
-	public function get_schema_continents()
+	protected function get_schema_continents()
 	{
 		return [
 			'COLUMNS'		=> [
@@ -93,7 +93,7 @@ class m1_initial_schema extends \phpbb\db\migration\migration
 	*
 	* @return array
 	*/
-	public function get_schema_countries()
+	protected function get_schema_countries()
 	{
 		return [
 			'COLUMNS'		=> [
@@ -136,7 +136,7 @@ class m1_initial_schema extends \phpbb\db\migration\migration
 	*
 	* @return array
 	*/
-	public function get_schema_country_units()
+	protected function get_schema_country_units()
 	{
 		return [
 			'COLUMNS'		=> [
@@ -178,7 +178,7 @@ class m1_initial_schema extends \phpbb\db\migration\migration
 	*
 	* @return array
 	*/
-	public function get_schema_languages()
+	protected function get_schema_languages()
 	{
 		return [
 			'COLUMNS'		=> [
@@ -213,7 +213,7 @@ class m1_initial_schema extends \phpbb\db\migration\migration
 	*
 	* @return array
 	*/
-	public function get_schema_language_scripts()
+	protected function get_schema_language_scripts()
 	{
 		return [
 			'COLUMNS'		=> [
@@ -236,7 +236,7 @@ class m1_initial_schema extends \phpbb\db\migration\migration
 	*
 	* @return array
 	*/
-	public function get_schema_currencies()
+	protected function get_schema_currencies()
 	{
 		return [
 			'COLUMNS'		=> [
