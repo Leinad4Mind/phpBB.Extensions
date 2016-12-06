@@ -27,7 +27,6 @@ class m1_initial_schema extends \phpbb\db\migration\migration
 				$this->gdecimal = 'DECIMAL(10,6)';
 			break;
 
-			case 'mssql':
 			case 'mssql_odbc':
 			case 'mssqlnative':
 				$this->gdecimal = '[float]';
