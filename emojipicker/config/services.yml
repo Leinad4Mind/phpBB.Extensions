@@ -1,0 +1,5 @@
+services:
+    vinabb.emojipicker.listener:
+        class: vinabb\emojipicker\event\listener
+        tags:
+            - { name: event.listener }

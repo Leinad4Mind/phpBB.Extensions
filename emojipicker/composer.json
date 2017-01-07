@@ -1,0 +1,35 @@
+{
+	"name": "vinabb/emojipicker",
+	"type": "phpbb-extension",
+	"description": "Adds the Emoji picker to the posting page and signature preview page.",
+	"homepage": "https://vinabb.vn/",
+	"version": "0.1.0",
+	"time": "2017-01-07",
+	"license": "GPL-2.0",
+	"authors": [{
+		"name": "Khoa Nguyen",
+		"email": "nedka@vinabb.vn",
+		"homepage": "https://nedka.vn/",
+		"role": "Developer"
+	}],
+	"require": {
+		"php": ">=5.3.3",
+		"composer/installers": "~1.0",
+		"emojione/emojione": "2.2.*"
+	},
+	"require-dev": {
+		"phpbb/epv": "dev-master"
+	},
+	"extra": {
+		"display-name": "Emoji Picker",
+		"soft-require": {
+			"phpbb/phpbb": ">=3.1.0,<3.2.0@dev"
+		},
+		"version-check": {
+			"host": "raw.githubusercontent.com",
+			"directory": "/VinaBB/phpBB.Extensions/3.1.x/update",
+			"filename": "emojipicker.json",
+			"ssl": true
+		}
+	}
+}

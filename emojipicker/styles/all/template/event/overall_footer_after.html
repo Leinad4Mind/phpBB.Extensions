@@ -1,0 +1,62 @@
+<script>
+	$(document).ready(function()
+	{
+		$('textarea#message, textarea#signature').emojioneArea({
+			attributes: {
+				dir: '{{ S_CONTENT_DIRECTION }}'
+			},
+			useInternalCDN: false,
+			imageType: 'svg',
+			sprite: false,
+			saveEmojisAs: 'shortname',
+			pickerPosition: 'bottom',
+			filtersPosition: 'bottom',
+			buttonTitle: "{{ lang('EMOJI_BUTTON_EXPLAIN')|e('js') }}",
+			filters: {
+				tones: {
+					title: "{{ lang(['EMOJI_CATS', 'TONES'])|e('js') }}"
+				},
+				recent: {
+					title: "{{ lang(['EMOJI_CATS', 'RECENT'])|e('js') }}"
+				},
+				smileys_people: {
+					title: "{{ lang(['EMOJI_CATS', 'SMILIES'])|e('js') }}"
+				},
+				animals_nature: {
+					title: "{{ lang(['EMOJI_CATS', 'NATURE'])|e('js') }}"
+				},
+				food_drink: {
+					title: "{{ lang(['EMOJI_CATS', 'FOOD'])|e('js') }}"
+				},
+				activity: {
+					title: "{{ lang(['EMOJI_CATS', 'ACTIVITIES'])|e('js') }}"
+				},
+				travel_places: {
+					title: "{{ lang(['EMOJI_CATS', 'TRAVEL'])|e('js') }}"
+				},
+				objects: {
+					title: "{{ lang(['EMOJI_CATS', 'OBJECTS'])|e('js') }}"
+				},
+				symbols: {
+					title: "{{ lang(['EMOJI_CATS', 'SYMBOLS'])|e('js') }}"
+				},
+				flags: {
+					icon : 'flag_gb',// Feel free to change to your 2-letter country code
+					title: "{{ lang(['EMOJI_CATS', 'FLAGS'])|e('js') }}"
+				}
+			}
+		});
+
+		// Keep the original height of textarea
+		var checkExist = setInterval(function()
+		{
+			if ($('div.emojionearea').length)
+			{
+				$('div.emojionearea').css({
+					'height': $('textarea#message').css('height') || $('textarea#signature').css('height')
+				});
+				clearInterval(checkExist);
+			}
+		}, 100);
+	});
+</script>
