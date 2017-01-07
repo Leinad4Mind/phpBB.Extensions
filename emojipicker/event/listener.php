@@ -56,7 +56,6 @@ class listener implements EventSubscriberInterface
 	{
 		$client = new Client(new Ruleset());
 		$client->imageType = 'svg';
-		$client->sprites = false;
 
 		$event['text'] = $client->shortnameToImage($event['text']);
 	}
