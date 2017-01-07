@@ -7,6 +7,13 @@
 */
 
 /**
+* English Translation
+*
+* @author Your Name
+* @link Your World
+*/
+
+/**
 * DO NOT CHANGE
 */
 if (!defined('IN_PHPBB'))

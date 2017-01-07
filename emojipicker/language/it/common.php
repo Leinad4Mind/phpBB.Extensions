@@ -4,7 +4,13 @@
 *
 * @copyright (c) VinaBB <vinabb.vn>
 * @license GNU General Public License, version 2 (GPL-2.0)
-* @italian language By alex75 www.phpbb-store.it
+*/
+
+/**
+* Italian Translation
+*
+* @author alex75
+* @link http://www.phpbb-store.it/
 */
 
 /**

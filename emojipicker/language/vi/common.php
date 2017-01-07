@@ -7,6 +7,13 @@
 */
 
 /**
+* Vietnamese Translation
+*
+* @author VinaBB
+* @link https://vinabb.vn/
+*/
+
+/**
 * DO NOT CHANGE
 */
 if (!defined('IN_PHPBB'))
