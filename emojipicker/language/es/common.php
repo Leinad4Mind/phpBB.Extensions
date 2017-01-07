@@ -4,7 +4,13 @@
 *
 * @copyright (c) VinaBB <vinabb.vn>
 * @license GNU General Public License, version 2 (GPL-2.0)
-* Spanish Translation: ThE KuKa - http://www.phpbb-es.com
+*/
+
+/**
+* Spanish Translation
+*
+* @author ThE KuKa
+* @link http://www.phpbb-es.com/
 */
 
 /**
