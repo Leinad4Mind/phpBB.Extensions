@@ -1,5 +1,12 @@
 {
 	"stable": {
+		"0.1": {
+			"current": "0.1.0",
+			"download": "https://github.com/VinaBB/phpBB.Extensions/releases/download/release-emojipicker-0.1.0/Emoji.Picker.0.1.0.zip",
+			"announcement": "https://vinabb.vn/",
+			"eol": null,
+			"security": false
+		},
 		"0.2": {
 			"current": "0.2.0",
 			"download": "https://github.com/VinaBB/phpBB.Extensions/releases/download/release-emojipicker-0.2.0/Emoji.Picker.0.2.0.zip",
