@@ -1,7 +1,7 @@
 <script>
 	$(document).ready(function()
 	{
-		$('textarea#message, textarea#signature').emojioneArea({
+		$('div#message-box > textarea').emojioneArea({
 			attributes: {
 				dir: '{{ S_CONTENT_DIRECTION }}'
 			},
@@ -53,8 +53,9 @@
 			if ($('div.emojionearea').length)
 			{
 				$('div.emojionearea').css({
-					'height': $('textarea#message').css('height') || $('textarea#signature').css('height')
+					'height': $('div#message-box > textarea').css('height')
 				});
+
 				clearInterval(checkExist);
 			}
 		}, 100);
