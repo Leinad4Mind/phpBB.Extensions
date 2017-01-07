@@ -24,11 +24,11 @@ class listener implements EventSubscriberInterface
 	*/
 	static public function getSubscribedEvents()
 	{
-		return [
+		return array(
 			'core.user_setup'						=> 'user_setup',
 			'core.modify_format_display_text_after'	=> 'convert_emoji_shortnames',
 			'core.modify_text_for_display_after'	=> 'convert_emoji_shortnames'
-		];
+		);
 	}
 
 	/**
@@ -40,10 +40,10 @@ class listener implements EventSubscriberInterface
 	{
 		// Add our common language variables
 		$lang_set_ext = $event['lang_set_ext'];
-		$lang_set_ext[] = [
+		$lang_set_ext[] = array(
 			'ext_name' => 'vinabb/emojipicker',
 			'lang_set' => 'common'
-		];
+		);
 		$event['lang_set_ext'] = $lang_set_ext;
 	}
 

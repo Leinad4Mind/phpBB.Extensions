@@ -16,16 +16,16 @@ if (!defined('IN_PHPBB'))
 
 if (empty($lang) || !is_array($lang))
 {
-	$lang = [];
+	$lang = array();
 }
 
 /**
 * All language files should use UTF-8 as their encoding
 * and the files must not contain a BOM.
 */
-$lang = array_merge($lang, [
+$lang = array_merge($lang, array(
 	'EMOJI_BUTTON_EXPLAIN'	=> 'Dùng phím Tab để chèn Emoji nhanh hơn.',
-	'EMOJI_CATS'			=> [
+	'EMOJI_CATS'			=> array(
 		'ACTIVITIES'	=> 'Hoạt động',
 		'FLAGS'			=> 'Cờ',
 		'FOOD'			=> 'Ăn uống',
@@ -36,5 +36,5 @@ $lang = array_merge($lang, [
 		'SYMBOLS'		=> 'Ký hiệu',
 		'TONES'			=> 'Màu da',
 		'TRAVEL'		=> 'Du lịch'
-	]
-]);
+	)
+));
