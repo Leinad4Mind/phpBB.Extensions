@@ -3,8 +3,8 @@
 	"type": "phpbb-extension",
 	"description": "Adds the Emoji picker to the posting page and signature preview page.",
 	"homepage": "https://vinabb.vn/",
-	"version": "0.2.1",
-	"time": "2017-01-07",
+	"version": "0.2.2",
+	"time": "2017-01-11",
 	"license": "GPL-2.0",
 	"authors": [{
 		"name": "Khoa Nguyen",
