@@ -55,13 +55,26 @@
 		// Text size dropdown list
 		$('select[name="addbbcode20"]').removeAttr('onchange');
 
-		// Quote buttons in the bottom review list
+		/**
+		* Quote buttons in the bottom review list
+		*
+		* 3.1:
+		*   BBCode: [quote="username"]text[/quote]
+		*   Post: addquote(2, 'username', 'wrote');
+		*   PM: addquote(2, 'username', 'wrote');
+		* 3.2:
+		*   BBCode: [quote=username post_id=1 time=1483964216 user_id=2]
+		*			text
+		*			[/quote]
+		*   Post: addquote(2, 'username', 'wrote', {post_id:1,time:1483964216,user_id:2});
+		*   PM: addquote(2, 'username', 'wrote', {time:1484074339,user_id:2});
+		*/
 		$('a[onclick^="addquote"]').each(function()
 		{
 			var quoteData = $(this).attr('onclick').replace(/['\s{}]/g, '').replace('addquote(', '').replace(');', '').replace(/:/g, '=').split(',');
 
 			$(this).attr({
-				'data-bbcode-tag-open': '[quote=' + quoteData[1] + ' ' + quoteData[3] + ' ' + quoteData[4] + ' ' + quoteData[5] + ']' + '<br>' + $('#message_' + quoteData[0]).html() + '<br>',
+				'data-bbcode-tag-open': '[quote="' + quoteData[1] + '"]' + $('#message_' + quoteData[0]).html(),
 				'data-bbcode-tag-close': '[/quote]'
 			});
 
