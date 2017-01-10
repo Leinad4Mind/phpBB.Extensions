@@ -1,0 +1,296 @@
+<!-- INCLUDECSS @vinabb_emojipicker/emojionearea.min.css -->
+<!-- INCLUDEJS @vinabb_emojipicker/emojionearea.min.js -->
+<!-- INCLUDEJS @vinabb_emojipicker/jquery.caret.min.js -->
+
+<script>
+	/** global bbtags */
+
+	$(document).ready(function()
+	{
+		/**
+		* BBCode buttons
+		*
+		* 3.1:
+		*	<input name="addbbcode*"...
+		*	<input name="addlistitem"...
+		*
+		* 3.2:
+		*	<button name="addbbcode*"...
+		*	<button name="addlistitem"...
+		*/
+		$('input[name^="addbbcode"]').each(function()
+		{
+			var bbcodeIndex = parseInt($(this).attr('onclick').replace('bbstyle(', '').replace(')', ''));
+
+			$(this).attr({
+				'data-bbcode-tag-open': (typeof bbtags[bbcodeIndex] !== 'undefined') ? bbtags[bbcodeIndex] : '',
+				'data-bbcode-tag-close': (typeof bbtags[bbcodeIndex + 1] !== 'undefined') ? bbtags[bbcodeIndex + 1] : ''
+			});
+
+			$(this).removeAttr('onclick');
+		});
+
+		$('input[name="addlistitem"]').each(function()
+		{
+			$(this).attr({
+				'data-bbcode-tag-open': $(this).val(),
+				'data-bbcode-tag-close': ''
+			});
+
+			$(this).removeAttr('onclick');
+		});
+
+		// Color picker
+		$('a[data-color]').each(function()
+		{
+			$(this).attr({
+				'data-bbcode-tag-open': '[color=#' + $(this).data('color') + ']',
+				'data-bbcode-tag-close': '[/color]'
+			});
+
+			$(this).removeAttr('href');
+			$(this).css('cursor', 'pointer');
+		});
+
+		// Text size dropdown list
+		$('select[name="addbbcode20"]').removeAttr('onchange');
+
+		// Quote buttons in the bottom review list
+		$('a[onclick^="addquote"]').each(function()
+		{
+			var quoteData = $(this).attr('onclick').replace(/['\s{}]/g, '').replace('addquote(', '').replace(');', '').replace(/:/g, '=').split(',');
+
+			$(this).attr({
+				'data-bbcode-tag-open': '[quote=' + quoteData[1] + ' ' + quoteData[3] + ' ' + quoteData[4] + ' ' + quoteData[5] + ']' + '<br>' + $('#message_' + quoteData[0]).html() + '<br>',
+				'data-bbcode-tag-close': '[/quote]'
+			});
+
+			$(this).removeAttr('href').removeAttr('onclick');
+		});
+
+		// Smilies
+		$('div#smiley-box > a').each(function()
+		{
+			$(this).attr('data-smiley-code', $(this).find('img').attr('alt'));
+			$(this).removeAttr('href').removeAttr('onclick');
+			$(this).css('cursor', 'pointer');
+		});
+
+		// Set the attribute data-emojipicker="true" to load Emoji Picker on other extensions
+		var $emojiPicker = $('div#message-box > textarea, textarea[data-emojipicker="true"]');
+
+		$emojiPicker.emojioneArea({
+			attributes: {
+				dir: '{{ S_CONTENT_DIRECTION }}'
+			},
+			useInternalCDN: false,
+			imageType: 'svg',
+			sprite: false,
+			saveEmojisAs: 'shortname',
+			pickerPosition: 'bottom',
+			filtersPosition: 'bottom',
+			buttonTitle: "{{ lang('EMOJI_BUTTON_EXPLAIN')|e('js') }}",
+			filters: {
+				tones: {
+					title: "{{ lang(['EMOJI_CATS', 'TONES'])|e('js') }}"
+				},
+				recent: {
+					title: "{{ lang(['EMOJI_CATS', 'RECENT'])|e('js') }}"
+				},
+				smileys_people: {
+					title: "{{ lang(['EMOJI_CATS', 'SMILIES'])|e('js') }}"
+				},
+				animals_nature: {
+					title: "{{ lang(['EMOJI_CATS', 'NATURE'])|e('js') }}"
+				},
+				food_drink: {
+					title: "{{ lang(['EMOJI_CATS', 'FOOD'])|e('js') }}"
+				},
+				activity: {
+					title: "{{ lang(['EMOJI_CATS', 'ACTIVITIES'])|e('js') }}"
+				},
+				travel_places: {
+					title: "{{ lang(['EMOJI_CATS', 'TRAVEL'])|e('js') }}"
+				},
+				objects: {
+					title: "{{ lang(['EMOJI_CATS', 'OBJECTS'])|e('js') }}"
+				},
+				symbols: {
+					title: "{{ lang(['EMOJI_CATS', 'SYMBOLS'])|e('js') }}"
+				},
+				flags: {
+					icon : 'flag_gb',// Feel free to change to your 2-letter country code
+					title: "{{ lang(['EMOJI_CATS', 'FLAGS'])|e('js') }}"
+				}
+			}
+		});
+
+		// Keep the original height of textarea
+		var checkExist = setInterval(function()
+		{
+			if ($('div.emojionearea').length)
+			{
+				$('div.emojionearea').css({
+					'height': $emojiPicker.css('height'),
+					'font-size': $emojiPicker.css('font-size')
+				});
+
+				clearInterval(checkExist);
+			}
+		}, 100);
+	});
+
+	(function (document, window, $)
+	{
+		// Remove default click events from color buttons
+		phpbb.registerPalette = function(el)
+		{
+			var	orientation	= el.attr('data-orientation'),
+				height		= el.attr('data-height'),
+				width		= el.attr('data-width'),
+				target		= el.attr('data-target'),
+				bbcode		= el.attr('data-bbcode');
+
+			// Insert the palette HTML into the container.
+			el.html(phpbb.colorPalette(orientation, width, height));
+		};
+
+		{% if S_PLUPLOAD %}
+		var pasteHtmlAtCaret = function(html)
+		{
+			var sel, range;
+
+			if (window.getSelection)
+			{
+				sel = window.getSelection();
+
+				if (sel.getRangeAt && sel.rangeCount)
+				{
+					range = sel.getRangeAt(0);
+					range.deleteContents();
+					var el = document.createElement("div");
+					el.innerHTML = html;
+					var frag = document.createDocumentFragment(), node, lastNode;
+
+					while (node = el.firstChild)
+					{
+						lastNode = frag.appendChild(node);
+					}
+
+					range.insertNode(frag);
+
+					if (lastNode)
+					{
+						range = range.cloneRange();
+						range.setStartAfter(lastNode);
+						range.collapse(true);
+						sel.removeAllRanges();
+						sel.addRange(range);
+					}
+				}
+			}
+			else if (document.selection && document.selection.type != "Control")
+			{
+				document.selection.createRange().pasteHTML(html);
+			}
+		};
+
+		var updatePlaceInline = function()
+		{
+			$('[data-attach-id]').each(function(i)
+			{
+				var filename = $(this).find('span.file-name > a').text();
+				var $button = $(this).find('span.attach-controls > input');
+
+				// Remove click events on old inline-attach buttons
+				$button.off('click');
+				console.log(i);
+
+				$button.on('click', function()
+				{
+					$('div.emojionearea-editor').focus();
+					pasteHtmlAtCaret('[attachment=' + i + ']' + filename + '[/attachment]');
+				});
+			});
+		};
+
+		// Update inline-attach buttons on preview or edit mode
+		updatePlaceInline();
+
+		phpbb.plupload.updateBbcode = function(action, index)
+		{
+			// Update attachment indexes or remove attachment tags assigned to deleted files
+			var	textarea = $('div.emojionearea-editor'),
+				text = textarea.html(),
+				removal = (action === 'removal');
+
+			// Return if the bbcode isn't used at all.
+			if (text.indexOf('[attachment=') === -1)
+			{
+				return;
+			}
+
+			function runUpdate(i)
+			{
+				var regex = new RegExp('\\[attachment=' + i + '\\](.*?)\\[\\/attachment\\]', 'g');
+				text = text.replace(regex, function updateBbcode(_, fileName)
+				{
+					// Remove the bbcode if the file was removed.
+					if (removal && index === i)
+					{
+						return '';
+					}
+
+					var newIndex = i + ((removal) ? -1 : 1);
+
+					return '[attachment=' + newIndex + ']' + fileName + '[/attachment]';
+				});
+			}
+
+			// Loop forwards when removing and backwards when adding ensures we don't
+			// corrupt the bbcode index.
+			var i;
+
+			if (removal)
+			{
+				for (i = index; i < phpbb.plupload.ids.length; i++)
+				{
+					runUpdate(i);
+				}
+			}
+			else
+			{
+				for (i = phpbb.plupload.ids.length - 1; i >= index; i--)
+				{
+					runUpdate(i);
+				}
+			}
+
+			textarea.html(text);
+		};
+
+		// Update inline-attach buttons
+		var oldEnableUploader = phpbb.plupload.enableUploader;
+		phpbb.plupload.enableUploader = function()
+		{
+			updatePlaceInline();
+			oldEnableUploader();
+		};
+
+		var oldDeleteFile = phpbb.plupload.deleteFile;
+		phpbb.plupload.deleteFile = function(row, attachId)
+		{
+			$('[data-attach-id]').each(function(i)
+			{
+				var $button = $(this).find('span.attach-controls > input');
+
+				// Remove click events on old inline-attach buttons
+				$button.off('click');
+			});
+
+			oldDeleteFile(row, attachId);
+			updatePlaceInline();
+		}
+		{% endif %}
+	})(document, window, jQuery);
+</script>
