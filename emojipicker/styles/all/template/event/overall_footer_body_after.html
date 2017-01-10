@@ -129,7 +129,8 @@
 			if ($('div.emojionearea').length)
 			{
 				$('div.emojionearea').css({
-					'height': $emojiPicker.css('height')
+					'height': $emojiPicker.css('height'),
+					'font-size': $emojiPicker.css('font-size')
 				});
 
 				clearInterval(checkExist);
@@ -192,13 +193,18 @@
 			}
 		};
 
-		var patchPlaceInline = function()
+		var updatePlaceInline = function()
 		{
 			$('[data-attach-id]').each(function(i)
 			{
 				var filename = $(this).find('span.file-name > a').text();
+				var $button = $(this).find('span.attach-controls > input');
 
-				$(this).on('click', function()
+				// Remove click events on old inline-attach buttons
+				$button.off('click');
+				console.log(i);
+
+				$button.on('click', function()
 				{
 					$('div.emojionearea-editor').focus();
 					pasteHtmlAtCaret('[attachment=' + i + ']' + filename + '[/attachment]');
@@ -206,10 +212,12 @@
 			});
 		};
 
-		patchPlaceInline();
+		// Update inline-attach buttons on preview or edit mode
+		updatePlaceInline();
 
 		phpbb.plupload.updateBbcode = function(action, index)
 		{
+			// Update attachment indexes or remove attachment tags assigned to deleted files
 			var	textarea = $('div.emojionearea-editor'),
 				text = textarea.html(),
 				removal = (action === 'removal');
@@ -259,13 +267,28 @@
 			textarea.html(text);
 		};
 
+		// Update inline-attach buttons
+		var oldEnableUploader = phpbb.plupload.enableUploader;
 		phpbb.plupload.enableUploader = function()
 		{
-			patchPlaceInline();
-
-			$('#add_files').removeClass('disabled');
-			phpbb.plupload.uploader.disableBrowse(false);
+			updatePlaceInline();
+			oldEnableUploader();
 		};
+
+		var oldDeleteFile = phpbb.plupload.deleteFile;
+		phpbb.plupload.deleteFile = function(row, attachId)
+		{
+			$('[data-attach-id]').each(function(i)
+			{
+				var $button = $(this).find('span.attach-controls > input');
+
+				// Remove click events on old inline-attach buttons
+				$button.off('click');
+			});
+
+			oldDeleteFile(row, attachId);
+			updatePlaceInline();
+		}
 		{% endif %}
 	})(document, window, jQuery);
 </script>
