@@ -1,10 +1,79 @@
 <!-- INCLUDECSS @vinabb_emojipicker/emojionearea.min.css -->
-<!-- INCLUDEJS @vinabb_emojipicker/emojionearea.min.js -->
+<!-- INCLUDEJS @vinabb_emojipicker/emojionearea.js -->
+<!-- INCLUDEJS @vinabb_emojipicker/jquery.caret.min.js -->
 
 <script>
+	/** global bbtags */
+
 	$(document).ready(function()
 	{
-		$('div#message-box > textarea').emojioneArea({
+		/**
+		* BBCode buttons
+		*
+		* 3.1:
+		*	<input name="addbbcode*"...
+		*	<input name="addlistitem"...
+		*
+		* 3.2:
+		*	<button name="addbbcode*"...
+		*	<button name="addlistitem"...
+		*/
+		$('button[name^="addbbcode"]').each(function()
+		{
+			var bbcodeIndex = parseInt($(this).attr('onclick').replace('bbstyle(', '').replace(')', ''));
+
+			$(this).attr({
+				'data-bbcode-tag-open': (typeof bbtags[bbcodeIndex] !== 'undefined') ? bbtags[bbcodeIndex] : '',
+				'data-bbcode-tag-close': (typeof bbtags[bbcodeIndex + 1] !== 'undefined') ? bbtags[bbcodeIndex + 1] : ''
+			});
+
+			$(this).removeAttr('onclick');
+		});
+
+		$('button[name="addlistitem"]').each(function()
+		{
+			$(this).attr({
+				'data-bbcode-tag-open': $(this).val(),
+				'data-bbcode-tag-close': ''
+			});
+
+			$(this).removeAttr('onclick');
+		});
+
+		$('a[data-color]').each(function()
+		{
+			$(this).attr({
+				'data-bbcode-tag-open': '[color=#' + $(this).data('color') + ']',
+				'data-bbcode-tag-close': '[/color]'
+			});
+		});
+
+		$('select[name="addbbcode20"]').removeAttr('onchange');
+
+		$('a[onclick^="addquote"]').each(function()
+		{
+			var quoteData = $(this).attr('onclick').replace(/['\s{}]/g, '').replace('addquote(', '').replace(');', '').replace(/:/g, '=').split(',');
+
+			$(this).attr({
+				'data-bbcode-tag-open': '[quote=' + quoteData[1] + ' ' + quoteData[3] + ' ' + quoteData[4] + ' ' + quoteData[5] + ']' + '<br>' + $('#message_' + quoteData[0]).html() + '<br>',
+				'data-bbcode-tag-close': '[/quote]'
+			});
+
+			$(this).removeAttr('href');
+			$(this).removeAttr('onclick');
+		});
+
+		// Smilies
+		$('div#smiley-box > a').each(function()
+		{
+			$(this).attr('data-smiley-code', $(this).find('img').attr('alt'));
+			$(this).removeAttr('href').removeAttr('onclick');
+		});
+
+		// Set the attribute data-emojipicker="true" to load Emoji Picker on other extensions
+		var $emojiPicker = $('div#message-box > textarea, textarea[data-emojipicker="true"]');
+
+		$emojiPicker.emojioneArea({
 			attributes: {
 				dir: '{{ S_CONTENT_DIRECTION }}'
 			},
@@ -54,11 +123,62 @@
 			if ($('div.emojionearea').length)
 			{
 				$('div.emojionearea').css({
-					'height': $('div#message-box > textarea').css('height')
+					'height': $emojiPicker.css('height')
 				});
 
 				clearInterval(checkExist);
 			}
 		}, 100);
 	});
+
+	{% if S_PLUPLOAD %}
+	(function ($) {
+		phpbb.plupload.updateBbcode = function(action, index)
+		{
+			$('[data-attach-id]').each(function(i)
+			{
+				$(this).find('input.file-inline-bbcode').attr({
+					'data-bbcode-tag-open': '[attachment=' + i + ']',
+					'data-bbcode-tag-close': '[/attachment]'
+				});
+			});
+
+			var	textarea = $('div.emojionearea-editor'),
+				text = textarea.html(),
+				removal = (action === 'removal');
+
+			// Return if the bbcode isn't used at all.
+			if (text.indexOf('[attachment=') === -1) {
+				return;
+			}
+
+			function runUpdate(i) {
+				var regex = new RegExp('\\[attachment=' + i + '\\](.*?)\\[\\/attachment\\]', 'g');
+				text = text.replace(regex, function updateBbcode(_, fileName) {
+					// Remove the bbcode if the file was removed.
+					if (removal && index === i) {
+						return '';
+					}
+					var newIndex = i + ((removal) ? -1 : 1);
+					return '[attachment=' + newIndex + ']' + fileName + '[/attachment]';
+				});
+			}
+
+			// Loop forwards when removing and backwards when adding ensures we don't
+			// corrupt the bbcode index.
+			var i;
+			if (removal) {
+				for (i = index; i < phpbb.plupload.ids.length; i++) {
+					runUpdate(i);
+				}
+			} else {
+				for (i = phpbb.plupload.ids.length - 1; i >= index; i--) {
+					runUpdate(i);
+				}
+			}
+
+			textarea.html(text);
+		};
+	})(jQuery);
+	{% endif %}
 </script>
