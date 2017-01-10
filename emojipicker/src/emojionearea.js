@@ -930,8 +930,6 @@
             {
                 $('div.emojionearea-editor').caret('pos', $('div.emojionearea-editor').caret('pos') - bbcodebtn.data('bbcode-tag-close').length);
             }
-
-            bbcodebtn.preventDefault();
         })
 
         .on("@smileybtn.click", function(smileybtn) {
@@ -946,8 +944,6 @@
                 saveSelection(editor[0]);
                 pasteHtmlAtCaret(' ' + smileybtn.data('smiley-code') + ' ');
             }
-
-            smileybtn.preventDefault();
         })
 
         .on("@emojibtn.click", function(emojibtn) {
