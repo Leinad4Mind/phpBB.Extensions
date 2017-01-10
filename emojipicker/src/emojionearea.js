@@ -4,6 +4,8 @@
  * Copyright Andrey Izman and other contributors
  * Released under the MIT license
  * Date: 2016-09-27T09:32Z
+ *
+ * Modified version for phpBB editor
  */
 (function(document, window, $) {
     'use strict';
@@ -25,6 +27,19 @@
     var css_class = "emojionearea";
     var emojioneSupportMode = 0;
     var invisibleChar = '&#8203;';
+
+    function getSelectedText()
+    {
+        var text = '';
+        if (window.getSelection) {
+            text = window.getSelection().toString();
+        } else if (document.selection && document.selection.type != "Control") {
+            text = document.selection.createRange().text;
+        }
+
+        return text;
+    }
+
     function trigger(self, event, args) {
         var result = true, j = 1;
         if (event) {
@@ -96,7 +111,6 @@
             }
         } else if (document.selection && document.selection.type != "Control") {
             document.selection.createRange().pasteHTML(html);
-            console.log('O');
         }
     }
     var getDefaultOptions = function () {
@@ -865,13 +879,7 @@
         })
 
         .on("@bbcodesize.change", function(bbcodebtn) {
-            var text = '';
-            if (window.getSelection) {
-                text = window.getSelection().toString();
-            } else if (document.selection && document.selection.type != "Control") {
-                text = document.selection.createRange().text;
-            }
-
+            var text = getSelectedText();
             var insertText = '';
             var closeTagLength = 0;
 
@@ -904,12 +912,7 @@
         })
 
         .on("@bbcodebtn.click", function(bbcodebtn) {
-            var text = '';
-            if (window.getSelection) {
-                text = window.getSelection().toString();
-            } else if (document.selection && document.selection.type != "Control") {
-                text = document.selection.createRange().text;
-            }
+            var text = getSelectedText();
 
             editor.removeClass("has-placeholder");
             if (!app.is(".focused")) {
@@ -927,6 +930,8 @@
             {
                 $('div.emojionearea-editor').caret('pos', $('div.emojionearea-editor').caret('pos') - bbcodebtn.data('bbcode-tag-close').length);
             }
+
+            bbcodebtn.preventDefault();
         })
 
         .on("@smileybtn.click", function(smileybtn) {
@@ -941,6 +946,8 @@
                 saveSelection(editor[0]);
                 pasteHtmlAtCaret(' ' + smileybtn.data('smiley-code') + ' ');
             }
+
+            smileybtn.preventDefault();
         })
 
         .on("@emojibtn.click", function(emojibtn) {

@@ -40,16 +40,22 @@
 			$(this).removeAttr('onclick');
 		});
 
+		// Color picker
 		$('a[data-color]').each(function()
 		{
 			$(this).attr({
 				'data-bbcode-tag-open': '[color=#' + $(this).data('color') + ']',
 				'data-bbcode-tag-close': '[/color]'
 			});
+
+			$(this).removeAttr('href');
+			$(this).css('cursor', 'pointer');
 		});
 
+		// Text size dropdown list
 		$('select[name="addbbcode20"]').removeAttr('onchange');
 
+		// Quote buttons in the bottom review list
 		$('a[onclick^="addquote"]').each(function()
 		{
 			var quoteData = $(this).attr('onclick').replace(/['\s{}]/g, '').replace('addquote(', '').replace(');', '').replace(/:/g, '=').split(',');
@@ -59,8 +65,7 @@
 				'data-bbcode-tag-close': '[/quote]'
 			});
 
-			$(this).removeAttr('href');
-			$(this).removeAttr('onclick');
+			$(this).removeAttr('href').removeAttr('onclick');
 		});
 
 		// Smilies
@@ -68,6 +73,7 @@
 		{
 			$(this).attr('data-smiley-code', $(this).find('img').attr('alt'));
 			$(this).removeAttr('href').removeAttr('onclick');
+			$(this).css('cursor', 'pointer');
 		});
 
 		// Set the attribute data-emojipicker="true" to load Emoji Picker on other extensions
@@ -131,35 +137,102 @@
 		}, 100);
 	});
 
-	{% if S_PLUPLOAD %}
-	(function ($) {
-		phpbb.plupload.updateBbcode = function(action, index)
+	(function (document, window, $)
+	{
+		// Remove default click events from color buttons
+		phpbb.registerPalette = function(el)
+		{
+			var	orientation	= el.attr('data-orientation'),
+				height		= el.attr('data-height'),
+				width		= el.attr('data-width'),
+				target		= el.attr('data-target'),
+				bbcode		= el.attr('data-bbcode');
+
+			// Insert the palette HTML into the container.
+			el.html(phpbb.colorPalette(orientation, width, height));
+		};
+
+		{% if S_PLUPLOAD %}
+		var pasteHtmlAtCaret = function(html)
+		{
+			var sel, range;
+
+			if (window.getSelection)
+			{
+				sel = window.getSelection();
+
+				if (sel.getRangeAt && sel.rangeCount)
+				{
+					range = sel.getRangeAt(0);
+					range.deleteContents();
+					var el = document.createElement("div");
+					el.innerHTML = html;
+					var frag = document.createDocumentFragment(), node, lastNode;
+
+					while (node = el.firstChild)
+					{
+						lastNode = frag.appendChild(node);
+					}
+
+					range.insertNode(frag);
+
+					if (lastNode)
+					{
+						range = range.cloneRange();
+						range.setStartAfter(lastNode);
+						range.collapse(true);
+						sel.removeAllRanges();
+						sel.addRange(range);
+					}
+				}
+			}
+			else if (document.selection && document.selection.type != "Control")
+			{
+				document.selection.createRange().pasteHTML(html);
+			}
+		};
+
+		var patchPlaceInline = function()
 		{
 			$('[data-attach-id]').each(function(i)
 			{
-				$(this).find('input.file-inline-bbcode').attr({
-					'data-bbcode-tag-open': '[attachment=' + i + ']',
-					'data-bbcode-tag-close': '[/attachment]'
+				var filename = $(this).find('span.file-name > a').text();
+
+				$(this).on('click', function()
+				{
+					$('div.emojionearea-editor').focus();
+					pasteHtmlAtCaret('[attachment=' + i + ']' + filename + '[/attachment]');
 				});
 			});
+		};
 
+		patchPlaceInline();
+
+		phpbb.plupload.updateBbcode = function(action, index)
+		{
 			var	textarea = $('div.emojionearea-editor'),
 				text = textarea.html(),
 				removal = (action === 'removal');
 
 			// Return if the bbcode isn't used at all.
-			if (text.indexOf('[attachment=') === -1) {
+			if (text.indexOf('[attachment=') === -1)
+			{
 				return;
 			}
 
-			function runUpdate(i) {
+			function runUpdate(i)
+			{
 				var regex = new RegExp('\\[attachment=' + i + '\\](.*?)\\[\\/attachment\\]', 'g');
-				text = text.replace(regex, function updateBbcode(_, fileName) {
+				text = text.replace(regex, function updateBbcode(_, fileName)
+				{
 					// Remove the bbcode if the file was removed.
-					if (removal && index === i) {
+					if (removal && index === i)
+					{
 						return '';
 					}
+
 					var newIndex = i + ((removal) ? -1 : 1);
+
 					return '[attachment=' + newIndex + ']' + fileName + '[/attachment]';
 				});
 			}
@@ -167,18 +240,32 @@
 			// Loop forwards when removing and backwards when adding ensures we don't
 			// corrupt the bbcode index.
 			var i;
-			if (removal) {
-				for (i = index; i < phpbb.plupload.ids.length; i++) {
+
+			if (removal)
+			{
+				for (i = index; i < phpbb.plupload.ids.length; i++)
+				{
 					runUpdate(i);
 				}
-			} else {
-				for (i = phpbb.plupload.ids.length - 1; i >= index; i--) {
+			}
+			else
+			{
+				for (i = phpbb.plupload.ids.length - 1; i >= index; i--)
+				{
 					runUpdate(i);
 				}
 			}
 
 			textarea.html(text);
 		};
-	})(jQuery);
-	{% endif %}
+
+		phpbb.plupload.enableUploader = function()
+		{
+			patchPlaceInline();
+
+			$('#add_files').removeClass('disabled');
+			phpbb.plupload.uploader.disableBrowse(false);
+		};
+		{% endif %}
+	})(document, window, jQuery);
 </script>
