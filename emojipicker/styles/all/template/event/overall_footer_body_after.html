@@ -214,10 +214,6 @@
 				var filename = $(this).find('span.file-name > a').text();
 				var $button = $(this).find('span.attach-controls > input');
 
-				// Remove click events on old inline-attach buttons
-				$button.off('click');
-				console.log(i);
-
 				$button.on('click', function()
 				{
 					$('div.emojionearea-editor').focus();
