@@ -155,6 +155,19 @@
 					'word-break': 'break-all'
 				});
 
+				// Trick for FireFox incorrect caret position on the contenteditable elements: https://bugzilla.mozilla.org/show_bug.cgi?id=904846
+				if (/firefox/i.test(navigator.userAgent))
+				{
+					$('div.emojionearea-editor').on('click', function()
+					{
+						if (!$(this).html().length)
+						{
+							// Do not worry, any extra break lines will be removed
+							$(this).html('<br>');
+						}
+					});
+				}
+
 				clearInterval(checkExist);
 			}
 		}, 100);
