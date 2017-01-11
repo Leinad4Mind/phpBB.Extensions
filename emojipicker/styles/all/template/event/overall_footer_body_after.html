@@ -138,14 +138,20 @@
 			}
 		});
 
-		// Keep the original height of textarea
+		// Adjust the new contenteditable div as same as the original textarea
 		var checkExist = setInterval(function()
 		{
 			if ($('div.emojionearea').length)
 			{
+				// Keep the original font size
 				$('div.emojionearea').css({
-					'height': $emojiPicker.css('height'),
 					'font-size': $emojiPicker.css('font-size')
+				});
+
+				// Keep the original height, break long words
+				$('div.emojionearea-editor').css({
+					'min-height': $emojiPicker.css('height'),
+					'word-break': 'break-all'
 				});
 
 				clearInterval(checkExist);
