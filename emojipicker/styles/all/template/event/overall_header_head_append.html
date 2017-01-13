@@ -1,3 +1,5 @@
+{% if S_IN_POSTING or S_COMPOSE_PM or S_QUICK_REPLY or SIGNATURE_PREVIEW is defined %}
+
 <!-- INCLUDECSS @vinabb_emojipicker/emojione.min.css -->
 <!-- INCLUDECSS @vinabb_emojipicker/emojionearea.min.css -->
 
@@ -5,3 +7,5 @@
 <!-- INCLUDEJS @vinabb_emojipicker/jquery.textcomplete.min.js -->
 <!-- INCLUDEJS @vinabb_emojipicker/emojione.min.js -->
 <!-- INCLUDEJS @vinabb_emojipicker/emojionearea.min.js -->
+
+{% endif %}
