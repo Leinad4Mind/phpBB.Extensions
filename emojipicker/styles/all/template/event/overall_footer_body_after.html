@@ -42,6 +42,71 @@
 
 			$(this).removeAttr('onclick');
 		});
+		{% else %}
+		$('input[name^="addbbcode"]').each(function()
+		{
+			var abbcData = {
+				'align': 'center',
+				'float': 'left',
+				'dir': 'rtl',
+				'marq': 'left',
+				'mod': "{{ ABBC3_USERNAME|e('js') }}",
+				'highlight': 'yellow',
+				'glow': 'red',
+				'shadow': 'blue',
+				'dropshadow': 'blue',
+				'blur': 'blue'
+			};
+			var onClick = $(this).attr('onclick');
+			var removeOnClick = true;
+
+			if (onClick.indexOf('bbstyle') !== -1)
+			{
+				var bbcodeIndex = parseInt(onClick.replace('bbstyle(', '').replace(')', ''));
+
+				$(this).attr({
+					'data-bbcode-tag-open': (typeof bbtags[bbcodeIndex] !== 'undefined') ? bbtags[bbcodeIndex] : '',
+					'data-bbcode-tag-close': (typeof bbtags[bbcodeIndex + 1] !== 'undefined') ? bbtags[bbcodeIndex + 1] : ''
+				});
+			}
+			else if (onClick.indexOf('url') !== -1 || onClick.indexOf('BBvideo') !== -1)
+			{
+				removeOnClick = false;
+			}
+			else if (onClick.indexOf('bbspecial') !== -1)
+			{
+				var bbcodeData = onClick.replace('bbspecial(', '').replace(')', '').replace(/'/g, '').split(',');
+				var bbcodeIndex = parseInt(bbcodeData[1]);
+				var bbcodeOpen = (typeof bbtags[bbcodeIndex] !== 'undefined') ? bbtags[bbcodeIndex] : '';
+				var bbcodeClose = (typeof bbtags[bbcodeIndex + 1] !== 'undefined') ? bbtags[bbcodeIndex + 1] : '';
+
+				if (bbcodeData[0].indexOf('=') !== -1)
+				{
+					var key = bbcodeData[0].replace('=', '');
+					bbcodeOpen = bbcodeOpen.replace('=', '=' + ((typeof abbcData[key] !== 'undefined') ? abbcData[key] : ''));
+				}
+
+				$(this).attr({
+					'data-bbcode-tag-open': bbcodeOpen,
+					'data-bbcode-tag-close': bbcodeClose
+				});
+			}
+
+			if (removeOnClick)
+			{
+				$(this).removeAttr('onclick');
+			}
+		});
+
+		$('input[name="addlistitem"]').each(function()
+		{
+			$(this).attr({
+				'data-bbcode-tag-open': '[*]',
+				'data-bbcode-tag-close': ''
+			});
+
+			$(this).removeAttr('onclick');
+		});
 		{% endif %}
 
 		// Color picker
@@ -57,6 +122,11 @@
 		});
 
 		// Text size dropdown list
+		{% if S_VSE_ABBC3 %}
+		$('select[name="abbc3_font"]').removeAttr('onchange');
+		$('select[name="abbc3_addbbcode20"]').attr('name', 'addbbcode20');
+		{% endif %}
+
 		$('select[name="addbbcode20"]').removeAttr('onchange');
 
 		/**
