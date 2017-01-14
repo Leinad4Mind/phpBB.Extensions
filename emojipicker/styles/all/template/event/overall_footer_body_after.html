@@ -1,4 +1,6 @@
-{% if S_IN_POSTING or S_COMPOSE_PM or S_QUICK_REPLY or SIGNATURE_PREVIEW is defined %}
+{% set S_DMZX_MCHAT = MCHAT_INDEX and MCHAT_LOCATION is defined %}
+
+{% if S_IN_POSTING or S_COMPOSE_PM or S_QUICK_REPLY or SIGNATURE_PREVIEW is defined or S_DMZX_MCHAT %}
 
 <script>
 	/** global bbtags */
@@ -80,15 +82,26 @@
 		});
 
 		// Smilies
-		$('div#smiley-box > a').each(function()
+		var $smiley = {% if S_DMZX_MCHAT %}$('div#mchat-smilies > a'){% else %}$('div#smiley-box > a'){% endif %}
+
+		$smiley.each(function()
 		{
 			$(this).attr('data-smiley-code', $(this).find('img').attr('alt'));
 			$(this).removeAttr('href').removeAttr('onclick');
 			$(this).css('cursor', 'pointer');
 		});
 
+		{% if S_DMZX_MCHAT %}
+		$('input#mchat-input').attr('data-emojipicker', true);
+		$('input#mchat-input').wrap('<div id="mchat-content"></div>');
+		$('div#mchat-content').css({
+			'position': 'absolute',
+			'z-index': 1
+		});
+		{% endif %}
+
 		// Set the attribute data-emojipicker="true" to load Emoji Picker on other extensions
-		var $emojiPicker = $('div#message-box > textarea, textarea[data-emojipicker="true"]');
+		var $emojiPicker = $('div#message-box > textarea, [data-emojipicker="true"]');
 
 		$emojiPicker.emojioneArea({
 			attributes: {
@@ -98,10 +111,10 @@
 			imageType: 'svg',
 			sprite: false,
 			saveEmojisAs: 'shortname',
-			pickerPosition: 'bottom',
+			pickerPosition: "{{ S_DMZX_MCHAT ? 'top' : 'bottom'}}",
 			filtersPosition: 'bottom',
 			buttonTitle: "{{ lang('EMOJI_BUTTON_EXPLAIN')|e('js') }}",
-			placeholder: '{{ (lang('MESSAGE') ~ lang('ELLIPSIS'))|e('js') }}',
+			placeholder: "{{ (lang('MESSAGE') ~ lang('ELLIPSIS'))|e('js') }}",
 			filters: {
 				tones: {
 					title: "{{ lang(['EMOJI_CATS', 'TONES'])|e('js') }}"
@@ -166,9 +179,32 @@
 					});
 				}
 
+				{% if S_DMZX_MCHAT %}
+				$('div.emojionearea').css({
+					'width': (parseInt($('div#mchat-main').css('width')) - 10) + 'px'
+				});
+
+				$('div#mchat-buttons').css({
+					'padding-top': '40px'
+				});
+				{% endif %}
+
 				clearInterval(checkExist);
 			}
 		}, 100);
+
+		{% if S_DMZX_MCHAT %}
+		$('div.emojionearea-editor').on('keydown', function(e)
+		{
+			if(e.keyCode == 13)
+			{
+				$(this).blur();
+				mChat.add();
+				$(this).html('');
+				$(this).focus();
+			}
+		});
+		{% endif %}
 	});
 
 	(function (document, window, $)
@@ -186,7 +222,6 @@
 			el.html(phpbb.colorPalette(orientation, width, height));
 		};
 
-		{% if S_PLUPLOAD %}
 		var pasteHtmlAtCaret = function(html)
 		{
 			var sel, range;
@@ -226,6 +261,7 @@
 			}
 		};
 
+		{% if S_PLUPLOAD %}
 		var updatePlaceInline = function()
 		{
 			$('[data-attach-id]').each(function(i)
@@ -317,7 +353,15 @@
 
 			oldDeleteFile(row, attachId);
 			updatePlaceInline();
-		}
+		};
+		{% endif %}
+
+		{% if S_DMZX_MCHAT %}
+		insert_text = function(text)
+		{
+			$('div.emojionearea-editor').focus();
+			pasteHtmlAtCaret(text);
+		};
 		{% endif %}
 	})(document, window, jQuery);
 </script>
