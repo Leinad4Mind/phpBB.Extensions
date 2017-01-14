@@ -1,15 +1,15 @@
 {
 	"stable": {
 		"0.1": {
-			"current": "0.1.4",
-			"download": "https://github.com/VinaBB/phpBB.Extensions/releases/download/release-emojipicker-0.1.4/Emoji.Picker.0.1.4.zip",
+			"current": "0.1.5",
+			"download": "https://github.com/VinaBB/phpBB.Extensions/releases/download/release-emojipicker-0.1.5/Emoji.Picker.0.1.5.zip",
 			"announcement": "https://www.phpbb.com/community/viewtopic.php?f=456&t=2399596",
 			"eol": null,
 			"security": false
 		},
 		"0.2": {
-			"current": "0.2.4",
-			"download": "https://github.com/VinaBB/phpBB.Extensions/releases/download/release-emojipicker-0.2.4/Emoji.Picker.0.2.4.zip",
+			"current": "0.2.5",
+			"download": "https://github.com/VinaBB/phpBB.Extensions/releases/download/release-emojipicker-0.2.5/Emoji.Picker.0.2.5.zip",
 			"announcement": "https://www.phpbb.com/community/viewtopic.php?f=456&t=2399596",
 			"eol": null,
 			"security": false
