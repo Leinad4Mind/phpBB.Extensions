@@ -1,8 +1,10 @@
 <!-- INCLUDECSS @vinabb_emojipicker/emojione.min.css -->
 
 {% set S_DMZX_MCHAT = MCHAT_INDEX and MCHAT_LOCATION is defined %}
+{% set S_BOARDTOOLS_QUICKREPLY = S_QR_QUICKQUOTE_ENABLE is defined %}
+{% set S_VSE_ABBC3 = ABBC3_BBCODE_ICONS is defined %}
 
-{% if S_IN_POSTING or S_COMPOSE_PM or S_QUICK_REPLY or SIGNATURE_PREVIEW is defined or S_DMZX_MCHAT %}
+{% if S_IN_POSTING or S_COMPOSE_PM or S_QUICK_REPLY or SIGNATURE_PREVIEW is defined or S_DMZX_MCHAT or S_BOARDTOOLS_QUICKREPLY or S_VSE_ABBC3 %}
 
 <!-- INCLUDECSS @vinabb_emojipicker/emojionearea.min.css -->
 <!-- INCLUDEJS @vinabb_emojipicker/jquery.caret.min.js -->
