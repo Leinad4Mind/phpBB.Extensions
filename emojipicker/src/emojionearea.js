@@ -731,10 +731,12 @@
 
         var $bbcodeList = $('[data-bbcode-tag-open]');
         var $bbcodeSize = $('select[name="addbbcode20"]');
+        var $bbcodeFont = $('select[name="abbc3_font"]');
         var $smileyList = $('[data-smiley-code]');
 
         attach(self, $bbcodeList, {click: "bbcodebtn.click"});
         attach(self, $bbcodeSize, {change: "bbcodesize.change"});
+        attach(self, $bbcodeFont, {change: "bbcodefont.change"});
         attach(self, $smileyList, {click: "smileybtn.click"});
         attach(self, emojisList.find(".emojibtn"), {click: "emojibtn.click"});
         attach(self, window, {resize: "!resize"});
@@ -892,6 +894,29 @@
                 insertText = '[size=' + bbcodebtn.val() + ']' + text + '[/size]';
                 closeTagLength = 7;
             }
+
+            editor.removeClass("has-placeholder");
+            if (!app.is(".focused")) {
+                editor.focus();
+            }
+            if (self.standalone) {
+                editor.html(insertText);
+                self.trigger("blur");
+            } else {
+                saveSelection(editor[0]);
+                pasteHtmlAtCaret(insertText);
+            }
+
+            if (text.length === 0)
+            {
+                $('div.emojionearea-editor').caret('pos', $('div.emojionearea-editor').caret('pos') - closeTagLength);
+            }
+        })
+
+        .on("@bbcodefont.change", function(bbcodebtn) {
+            var text = getSelectedText();
+            var insertText = '[font=' + bbcodebtn.val() + ']' + text + '[/font]';
+            var closeTagLength = 7;
 
             editor.removeClass("has-placeholder");
             if (!app.is(".focused")) {
