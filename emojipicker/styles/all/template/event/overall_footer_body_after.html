@@ -246,7 +246,10 @@
 				// Keep the original height, break long words
 				$('div.emojionearea-editor').css({
 					'min-height': $emojiPicker.css('height'),
-					'word-break': 'break-all'
+					'word-break': 'break-word',
+					'-webkit-hyphens': 'auto',
+					'-ms-hyphens': 'auto',
+					'hyphens': 'auto'
 				});
 
 				// Trick for FireFox incorrect caret position on the contenteditable elements: https://bugzilla.mozilla.org/show_bug.cgi?id=904846
