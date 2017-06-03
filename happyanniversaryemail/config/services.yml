@@ -1,6 +1,6 @@
 services:
-    vinabb.happyanniversary.listener:
-        class: vinabb\happyanniversary\event\listener
+    vinabb.happyanniversaryemail.listener:
+        class: vinabb\happyanniversaryemail\event\listener
         arguments:
             - '@cache.driver'
             - '@config'

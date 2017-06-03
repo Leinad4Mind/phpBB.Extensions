@@ -89,7 +89,7 @@ class listener implements EventSubscriberInterface
 		// Add our common language variables
 		$lang_set_ext = $event['lang_set_ext'];
 		$lang_set_ext[] = [
-			'ext_name' => 'vinabb/happyanniversary',
+			'ext_name' => 'vinabb/happyanniversaryemail',
 			'lang_set' => 'common'
 		];
 		$event['lang_set_ext'] = $lang_set_ext;
@@ -107,7 +107,7 @@ class listener implements EventSubscriberInterface
 
 		foreach ($this->get_cache() as $user_id => $user_data)
 		{
-			$anniversary_users .= (($anniversary_users == '') ? '' : ', ') . get_username_string('full', $user_id, $user_data['username'], $user_data['user_colour']) . ' (' . $user_data['years'] . ')';
+			$anniversary_users .= (($anniversary_users == '') ? '' : ', ') . get_username_string('full', $user_id, $user_data['username'], $user_data['color']) . ' (' . $user_data['years'] . ')';
 		}
 
 		// Output
@@ -145,9 +145,10 @@ class listener implements EventSubscriberInterface
 			while ($row = $this->db->sql_fetchrow($result))
 			{
 				$anniversary_data[$row['user_id']] = [
-					'username'		=> $row['username'],
-					'user_colour'	=> $row['user_colour'],
-					'years'			=> $now_year - date('Y', $row['user_regdate'])
+					'username'	=> $row['username'],
+					'email'		=> $row['user_email'],
+					'color'		=> $row['user_colour'],
+					'years'		=> $now_year - date('Y', $row['user_regdate'])
 				];
 			}
 			$this->db->sql_freeresult($result);
@@ -181,7 +182,7 @@ class listener implements EventSubscriberInterface
 
 		// Build the query
 		$sql_ary = [
-			'SELECT' => 'u.user_id, u.username, u.user_colour, u.user_regdate',
+			'SELECT' => 'u.user_id, u.username, u.user_email, u.user_colour, u.user_regdate',
 			'FROM' => [USERS_TABLE => 'u'],
 			'LEFT_JOIN' => [
 				[
@@ -243,8 +244,8 @@ class listener implements EventSubscriberInterface
 
 		foreach ($anniversary_data as $user_id => $user_data)
 		{
-			$messenger = new messenger(false);
-			$messenger->template('happy_anniversary');
+			$messenger = new \messenger(false);
+			$messenger->template('@vinabb_happyanniversaryemail/happy_anniversary');
 			$messenger->to($user_data['email'], $user_data['username']);
 			$messenger->anti_abuse_headers($this->config, $this->user);
 			$messenger->assign_vars(array(
