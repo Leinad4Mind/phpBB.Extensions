@@ -1,0 +1,13 @@
+{
+	"stable": {
+		"0.2": {
+			"current": "0.2.0",
+			"download": "https://github.com/VinaBB/phpBB.Extensions/releases/download/release-happyanniversaryemail-0.2.0/Happy.Anniversary.Email.0.2.0.zip",
+			"announcement": "https://vinabb.vn/board/f14/topic/happy-anniversary.19",
+			"eol": null,
+			"security": false
+		}
+	},
+	"unstable": {
+	}
+}
