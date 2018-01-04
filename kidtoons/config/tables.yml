@@ -1,0 +1,8 @@
+parameters:
+    vinabb.kidtoons.tables.categories: '%core.table_prefix%kt_categories'
+    vinabb.kidtoons.tables.codecs: '%core.table_prefix%kt_codecs'
+    vinabb.kidtoons.tables.contributors: '%core.table_prefix%kt_contributors'
+    vinabb.kidtoons.tables.groups: '%core.table_prefix%kt_groups'
+    vinabb.kidtoons.tables.makers: '%core.table_prefix%kt_makers'
+    vinabb.kidtoons.tables.movies: '%core.table_prefix%kt_movies'
+    vinabb.kidtoons.tables.series: '%core.table_prefix%kt_series'

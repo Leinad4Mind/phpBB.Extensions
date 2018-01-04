@@ -1,0 +1,4 @@
+services:
+    vinabb.kidtoons.acp.categories:
+        class: vinabb\kidtoons\controllers\acp\categories
+        arguments:

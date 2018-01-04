@@ -1,0 +1,8 @@
+services:
+    vinabb.kidtoons.entities.category:
+        class: vinabb\kidtoons\entities\category
+        shared: false
+        arguments:
+            - '@dbal.conn'
+            - '@vinabb.kidtoons.helper.entity'
+            - '%vinabb.kidtoons.tables.categories%'

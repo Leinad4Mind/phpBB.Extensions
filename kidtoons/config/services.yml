@@ -1,0 +1,7 @@
+imports:
+    - { resource: tables.yml }
+    - { resource: services_entities.yml }
+    - { resource: services_operators.yml }
+    - { resource: services_table_lock.yml }
+    - { resource: services_acp_controllers.yml }
+    - { resource: services_controllers.yml }

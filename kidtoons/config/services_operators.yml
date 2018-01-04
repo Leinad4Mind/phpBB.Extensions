@@ -1,0 +1,6 @@
+services:
+    vinabb.kidtoons.operators.category:
+        class: vinabb\kidtoons\operators\category
+        arguments:
+            - '@service_container'
+            - '@vinabb.kidtoons.operators.nestedset_categories'

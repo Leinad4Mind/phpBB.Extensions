@@ -1,0 +1,7 @@
+services:
+    vinabb.kidtoons.table_lock.categories:
+        class: phpbb\lock\db
+        arguments:
+            - 'vinabb.kidtoons.table_lock.%vinabb.kidtoons.tables.categories%'
+            - '@config'
+            - '@dbal.conn'
