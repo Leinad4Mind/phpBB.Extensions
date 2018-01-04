@@ -1,0 +1,38 @@
+{
+	"name": "vinabb/kidtoons",
+	"type": "phpbb-extension",
+	"description": "Cartoon movie management system for KidToons.",
+	"homepage": "https://vinabb.vn/",
+	"version": "0.1.0",
+	"time": "2018-01-04",
+	"license": "GPL-2.0",
+	"authors": [{
+		"name": "nedka",
+		"email": "nedka@vinabb.vn",
+		"homepage": "https://nedka.vn/",
+		"role": "Developer"
+	}],
+	"support": {
+		"issues": "https://github.com/VinaBB/phpBB.Extensions/issues",
+		"forum": "https://vinabb.vn/board"
+	},
+	"require": {
+		"php": ">=5.4",
+		"composer/installers": "~1.0"
+	},
+	"require-dev": {
+		"phpbb/epv": "dev-master"
+	},
+	"extra": {
+		"display-name": "KidToons",
+		"soft-require": {
+			"phpbb/phpbb": ">=3.2.0,<3.3.0@dev"
+		},
+		"version-check": {
+			"host": "raw.githubusercontent.com",
+			"directory": "/VinaBB/phpBB.Extensions/master/update",
+			"filename": "kidtoons.json",
+			"ssl": true
+		}
+	}
+}
