@@ -1,0 +1,13 @@
+{
+	"stable": {
+		"1.0": {
+			"current": "1.0.0",
+			"download": "https://github.com/VinaBB/phpBB.Extensions/releases/download/release-timestop-1.0.0/Time.Stop.1.0.0.zip",
+			"announcement": "https://vinabb.vn/",
+			"eol": null,
+			"security": false
+		}
+	},
+	"unstable": {
+	}
+}
