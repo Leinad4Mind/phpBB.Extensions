@@ -1,0 +1,12 @@
+services:
+    vinabb.timestop.listener:
+        class: vinabb\timestop\events\listener
+        arguments:
+            - '@config'
+            - '@dbal.conn'
+            - '@language'
+            - '@request'
+            - '@template'
+            - '@user'
+        tags:
+            - { name: event.listener }
